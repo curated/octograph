@@ -1,0 +1,15 @@
+{
+  "extends": "../coding-standards/tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "dist",
+  },
+
+  "include": [
+    "src/**/*",
+  ],
+
+  "exclude": [
+    "node_modules",
+  ],
+}

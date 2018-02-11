@@ -1,0 +1,36 @@
+{
+  "name": "curated-octograph",
+  "version": "0.1.0",
+  "description": "github graphql client",
+  "author": "Wagner Camarao <wagner@camarao.io>",
+  "license": "MIT",
+  "main": "dist/main.js",
+  "homepage": "https://curated.github.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/curated/octograph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/curated/octograph/issues"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "lint": "tslint src/**/*.ts",
+    "test": "tsc && ava -v"
+  },
+  "ava": {
+    "require": [
+      "dotenv/config"
+    ]
+  },
+  "dependencies": {
+    "dotenv": "^5.0.0",
+    "node-fetch": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^9.4.5",
+    "ava": "^0.25.0",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.1"
+  }
+}
