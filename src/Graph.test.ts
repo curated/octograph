@@ -10,7 +10,7 @@ interface Organization {
 }
 
 class OrganizationQuery implements Query<Organization, Variables> {
-  public build(variables: Variables): RequestBody {
+  public build(variables: Variables): RequestBody<Variables> {
     return {
       query: gql`
         query Organization($login: String!) {
@@ -19,7 +19,7 @@ class OrganizationQuery implements Query<Organization, Variables> {
           }
         }
       `,
-      variables: JSON.stringify(variables),
+      variables,
     }
   }
 

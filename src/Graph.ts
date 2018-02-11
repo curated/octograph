@@ -4,13 +4,13 @@ if (!process.env.GITHUB_TOKEN) {
   throw new Error('Missing environment variable: GITHUB_TOKEN')
 }
 
-export interface RequestBody {
+export interface RequestBody<V> {
   query: string
-  variables: string
+  variables: V
 }
 
 export interface Query<T, V> {
-  build(variables: V): RequestBody
+  build(variables: V): RequestBody<V>
   parse(response: any): T
 }
 
