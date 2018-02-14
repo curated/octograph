@@ -1,6 +1,6 @@
 {
   "name": "curated-octograph",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "github graphql client",
   "author": "Wagner Camarao <wagner@camarao.io>",
   "license": "MIT",
