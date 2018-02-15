@@ -11,11 +11,12 @@ export const edges = {
         },
         {
           node: {
-            url: 'https://github.com/curated/octograph/issues/2',
+            id: 'BFWHIBFdeWIhFBIIFknIJWF=',
           },
         },
         {
           node: {
+            id: 'MDU6SXNzdWUyNDU4Mzg1MDY=',
             url: 'https://github.com/curated/octograph/issues/1',
             number: 1,
             title: 'foo',
@@ -23,31 +24,6 @@ export const edges = {
             state: 'CLOSED',
             createdAt: '2017-07-26T20:05:32Z',
             updatedAt: '2017-11-03T10:31:08Z',
-            author: {
-              url: 'https://github.com/inspectocat',
-              login: 'inspectocat',
-              avatarUrl:
-                'https://avatars0.githubusercontent.com/u/36428176?v=4',
-            },
-            repository: {
-              url: 'https://github.com/curated/octograph',
-              name: 'octograph',
-              owner: {
-                url: 'https://github.com/curated',
-                login: 'curated',
-                avatarUrl:
-                  'https://avatars2.githubusercontent.com/u/36278390?v=4',
-              },
-              primaryLanguage: {
-                name: 'TypeScript',
-              },
-              forks: {
-                totalCount: 123,
-              },
-              stargazers: {
-                totalCount: 456,
-              },
-            },
             reactionGroups: [
               {
                 content: 'THUMBS_DOWN',
@@ -86,6 +62,33 @@ export const edges = {
                 },
               },
             ],
+            author: {
+              url: 'https://github.com/inspectocat',
+              login: 'inspectocat',
+              avatarUrl:
+                'https://avatars0.githubusercontent.com/u/36428176?v=4',
+            },
+            repository: {
+              id: 'MDEwOlJlcG9zaXRvcnkxMDI3MDI1MA==',
+              url: 'https://github.com/curated/octograph',
+              name: 'octograph',
+              primaryLanguage: {
+                name: 'TypeScript',
+              },
+              forks: {
+                totalCount: 123,
+              },
+              stargazers: {
+                totalCount: 456,
+              },
+              owner: {
+                id: 'MDEyOk9yZ2FuaXphdGlvbjY5NjMx',
+                url: 'https://github.com/curated',
+                login: 'curated',
+                avatarUrl:
+                  'https://avatars2.githubusercontent.com/u/36278390?v=4',
+              },
+            },
           },
         },
       ],

@@ -10,6 +10,7 @@ export const query = gql`
       edges {
         node {
           ... on Issue {
+            id
             url
             number
             title
@@ -17,19 +18,21 @@ export const query = gql`
             state
             createdAt
             updatedAt
+            reactionGroups {
+              content
+              users {
+                totalCount
+              }
+            }
             author {
               url
               login
               avatarUrl
             }
             repository {
+              id
               url
               name
-              owner {
-                url
-                login
-                avatarUrl
-              }
               primaryLanguage {
                 name
               }
@@ -39,11 +42,11 @@ export const query = gql`
               stargazers {
                 totalCount
               }
-            }
-            reactionGroups {
-              content
-              users {
-                totalCount
+              owner {
+                id
+                url
+                login
+                avatarUrl
               }
             }
           }

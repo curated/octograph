@@ -11,6 +11,7 @@ export interface TopIssues {
 }
 
 export interface Issue {
+  githubId: string
   url: string
   number: number
   title: string
@@ -18,31 +19,29 @@ export interface Issue {
   state: string
   createdAt: Date
   updatedAt: Date
-  author: Actor
-  repository: Repository
-  reactionGroups: ReactionGroups
-}
-
-export interface Actor {
-  url: string
-  login: string
-  avatarUrl: string
-}
-
-export interface Repository {
-  url: string
-  name: string
-  owner: Actor
-  primaryLanguage: string
-  forks: number
-  stargazers: number
-}
-
-export interface ReactionGroups {
   heart: number
   hooray: number
   thumbsUp: number
   laugh: number
   confused: number
   thumbsDown: number
+  author: Actor
+  repository: Repository
+}
+
+export interface Actor {
+  githubId: string
+  url: string
+  login: string
+  avatarUrl: string
+}
+
+export interface Repository {
+  githubId: string
+  url: string
+  name: string
+  primaryLanguage: string
+  forks: number
+  stargazers: number
+  owner: Actor
 }
