@@ -36,7 +36,7 @@ const parseIssue = (edge: any): Issue => {
     laugh: getGroupCount('LAUGH', groups),
     confused: getGroupCount('CONFUSED', groups),
     thumbsDown: getGroupCount('THUMBS_DOWN', groups),
-    author: parseActor(node.author),
+    author: parseIssueAuthor(node.author),
     repository: parseRepository(node.repository),
   }
 }
@@ -44,6 +44,25 @@ const parseIssue = (edge: any): Issue => {
 const getGroupCount = (key: string, groups: any[]): number => {
   const group = R.find(g => Object.is(key, g.content), groups)
   return R.path(['users', 'totalCount'], group) || 0
+}
+
+const parseIssueAuthor = (author: any): Actor => {
+  if (!author) {
+    return undefined
+  }
+
+  const match = author.avatarUrl.match(/\/u\/(\d+)\?/)
+
+  if (!match || !match[1]) {
+    return undefined
+  }
+
+  return {
+    githubId: `${author.__typename}:${match[1]}`,
+    url: author.url,
+    login: author.login,
+    avatarUrl: author.avatarUrl,
+  }
 }
 
 const parseActor = (actor: any): Actor => {

@@ -54,7 +54,7 @@ test('parse issue with all properties', async t => {
     confused: 26,
     thumbsDown: 17,
     author: {
-      githubId: undefined,
+      githubId: 'User:36428176',
       url: 'https://github.com/inspectocat',
       login: 'inspectocat',
       avatarUrl: 'https://avatars0.githubusercontent.com/u/36428176?v=4',

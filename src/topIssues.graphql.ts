@@ -25,6 +25,7 @@ export const query = gql`
               }
             }
             author {
+              __typename
               url
               login
               avatarUrl
