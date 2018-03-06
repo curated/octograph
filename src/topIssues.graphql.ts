@@ -10,63 +10,88 @@ export const query = gql`
       edges {
         node {
           ... on Issue {
-            id
-            url
-            number
-            title
-            bodyText
-            state
-            createdAt
-            updatedAt
-            reactionGroups {
-              content
-              users {
-                totalCount
-              }
-            }
-            author {
-              ... on User {
-                id
-                url
-                login
-                avatarUrl
-              }
-              ... on Organization {
-                id
-                url
-                login
-                avatarUrl
-              }
-              ... on Bot {
-                id
-                url
-                login
-                avatarUrl
-              }
-            }
-            repository {
-              id
-              url
-              name
-              primaryLanguage {
-                name
-              }
-              forks {
-                totalCount
-              }
-              stargazers {
-                totalCount
-              }
-              owner {
-                id
-                url
-                login
-                avatarUrl
-              }
-            }
+            ...issue
           }
         }
       }
     }
+  }
+
+  fragment issue on Issue {
+    id
+    url
+    number
+    title
+    bodyText
+    state
+    createdAt
+    updatedAt
+    reactionGroups {
+      ...reactionGroup
+    }
+    author {
+      ...actor
+    }
+    repository {
+      ...repository
+    }
+  }
+
+  fragment reactionGroup on ReactionGroup {
+    content
+    users {
+      totalCount
+    }
+  }
+
+  fragment actor on Actor {
+    ... on User {
+      ...user
+    }
+    ... on Organization {
+      ...organization
+    }
+    ... on Bot {
+      ...bot
+    }
+  }
+
+  fragment repository on Repository {
+    id
+    url
+    name
+    primaryLanguage {
+      name
+    }
+    forks {
+      totalCount
+    }
+    stargazers {
+      totalCount
+    }
+    owner {
+      ...user
+    }
+  }
+
+  fragment user on User {
+    id
+    ...actorProps
+  }
+
+  fragment organization on Organization {
+    id
+    ...actorProps
+  }
+
+  fragment bot on Bot {
+    id
+    ...actorProps
+  }
+
+  fragment actorProps on Actor {
+    url
+    login
+    avatarUrl
   }
 `
