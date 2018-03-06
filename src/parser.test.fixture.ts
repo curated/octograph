@@ -63,7 +63,7 @@ export const edges = {
               },
             ],
             author: {
-              __typename: 'User',
+              id: 'MDQ6VXNlcjI0MDMxMQ==',
               url: 'https://github.com/inspectocat',
               login: 'inspectocat',
               avatarUrl:

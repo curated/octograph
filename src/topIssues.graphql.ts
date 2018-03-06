@@ -25,10 +25,24 @@ export const query = gql`
               }
             }
             author {
-              __typename
-              url
-              login
-              avatarUrl
+              ... on User {
+                id
+                url
+                login
+                avatarUrl
+              }
+              ... on Organization {
+                id
+                url
+                login
+                avatarUrl
+              }
+              ... on Bot {
+                id
+                url
+                login
+                avatarUrl
+              }
             }
             repository {
               id
