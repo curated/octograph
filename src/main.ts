@@ -1,1 +1,8 @@
-export { Actor, Issue, Repository } from './schema'
+export {
+  ActorSchema,
+  IssueSchema,
+  RepositorySchema,
+  TopIssues,
+  Variables,
+} from './schema'
+export { getTopIssues } from './topIssues'

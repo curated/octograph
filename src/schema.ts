@@ -1,3 +1,8 @@
+export interface RateLimit {
+  remaining: number
+  resetAt: Date
+}
+
 export interface Variables {
   query: string
   first: number
@@ -5,12 +10,12 @@ export interface Variables {
 }
 
 export interface TopIssues {
-  hasNextPage: boolean
+  rateLimit: RateLimit
   endCursor: string
-  issues: Issue[]
+  issues: IssueSchema[]
 }
 
-export interface Issue {
+export interface IssueSchema {
   githubId: string
   url: string
   number: number
@@ -25,23 +30,23 @@ export interface Issue {
   laugh: number
   confused: number
   thumbsDown: number
-  author: Actor
-  repository: Repository
+  author: ActorSchema
+  repository: RepositorySchema
 }
 
-export interface Actor {
+export interface ActorSchema {
   githubId: string
   url: string
   login: string
   avatarUrl: string
 }
 
-export interface Repository {
+export interface RepositorySchema {
   githubId: string
   url: string
   name: string
   primaryLanguage: string
   forks: number
   stargazers: number
-  owner: Actor
+  owner: ActorSchema
 }

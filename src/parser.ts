@@ -1,23 +1,37 @@
 import * as R from 'ramda'
-import { Actor, Issue, Repository, TopIssues } from './schema'
+import {
+  ActorSchema,
+  IssueSchema,
+  RepositorySchema,
+  TopIssues,
+  RateLimit,
+} from './schema'
 
 export const parse = (res: any): TopIssues => {
+  const rateLimit: any = R.path(['data', 'rateLimit'], res) || {}
   const search: any = R.path(['data', 'search'], res) || {}
   const pageInfo = search.pageInfo || {}
 
   return {
-    hasNextPage: pageInfo.hasNextPage,
+    rateLimit: parseRateLimit(rateLimit),
     endCursor: pageInfo.endCursor,
     issues: parseIssues(search.edges),
   }
 }
 
-const parseIssues = (edges: any[]): Issue[] => {
-  const issues = R.map(parseIssue, edges)
-  return R.reject((issue: Issue) => R.isNil(issue.githubId), issues)
+const parseRateLimit = (rateLimit: any): RateLimit => {
+  return {
+    remaining: rateLimit.remaining,
+    resetAt: rateLimit.resetAt && new Date(rateLimit.resetAt),
+  }
 }
 
-const parseIssue = (edge: any): Issue => {
+const parseIssues = (edges: any[]): IssueSchema[] => {
+  const issues = R.map(parseIssue, edges)
+  return R.reject((issue: IssueSchema) => R.isNil(issue.githubId), issues)
+}
+
+const parseIssue = (edge: any): IssueSchema => {
   const node: any = R.path(['node'], edge)
   const groups = node.reactionGroups || []
 
@@ -46,7 +60,7 @@ const getGroupCount = (key: string, groups: any[]): number => {
   return R.path(['users', 'totalCount'], group) || 0
 }
 
-const parseActor = (actor: any): Actor => {
+const parseActor = (actor: any): ActorSchema => {
   if (!actor) {
     return undefined
   }
@@ -59,7 +73,7 @@ const parseActor = (actor: any): Actor => {
   }
 }
 
-const parseRepository = (repository: any): Repository => {
+const parseRepository = (repository: any): RepositorySchema => {
   if (!repository) {
     return undefined
   }

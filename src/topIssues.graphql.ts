@@ -2,10 +2,12 @@ import { gql } from './graph'
 
 export const query = gql`
   query TopIssues($query: String!, $first: Int!, $after: String) {
+    rateLimit {
+      ...rateLimit
+    }
     search(type: ISSUE, query: $query, first: $first, after: $after) {
       pageInfo {
-        hasNextPage
-        endCursor
+        ...pageInfo
       }
       edges {
         node {
@@ -15,6 +17,15 @@ export const query = gql`
         }
       }
     }
+  }
+
+  fragment rateLimit on RateLimit {
+    remaining
+    resetAt
+  }
+
+  fragment pageInfo on PageInfo {
+    endCursor
   }
 
   fragment issue on Issue {
@@ -32,9 +43,9 @@ export const query = gql`
     author {
       ...actor
     }
-    repository {
-      ...repository
-    }
+    # repository {
+    #  ...repository
+    # }
   }
 
   fragment reactionGroup on ReactionGroup {
@@ -56,23 +67,23 @@ export const query = gql`
     }
   }
 
-  fragment repository on Repository {
-    id
-    url
-    name
-    primaryLanguage {
-      name
-    }
-    forks {
-      totalCount
-    }
-    stargazers {
-      totalCount
-    }
-    owner {
-      ...user
-    }
-  }
+  # fragment repository on Repository {
+  #   id
+  #   url
+  #   name
+  #   primaryLanguage {
+  #     name
+  #   }
+  #   forks {
+  #     totalCount
+  #   }
+  #   stargazers {
+  #     totalCount
+  #   }
+  #   owner {
+  #     ...user
+  #   }
+  # }
 
   fragment user on User {
     id

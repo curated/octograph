@@ -4,8 +4,12 @@ import { edges } from './parser.test.fixture'
 
 const topIssues = parse(edges)
 
-test('keep relevant page info', async t => {
-  t.true(topIssues.hasNextPage)
+test('rate limit', async t => {
+  t.is(topIssues.rateLimit.remaining, 4999)
+  t.deepEqual(topIssues.rateLimit.resetAt, new Date('2018-03-06T20:05:51Z'))
+})
+
+test('page info', async t => {
   t.is(topIssues.endCursor, 'Y3Vyc29yOjM=')
 })
 

@@ -2,10 +2,11 @@ import test from 'ava'
 import { getTopIssues } from './topIssues'
 
 test('search top issues by minimum number of reactions', async t => {
-  const res = await getTopIssues({ query: 'reactions:>1000', first: 10 })
-  t.true(res.hasNextPage)
-  t.true(res.endCursor.length > 0)
-  t.true(res.issues.length <= 10)
+  const topIssues = await getTopIssues({ query: 'reactions:>1000', first: 10 })
+  t.true(topIssues.rateLimit.remaining >= 0)
+  t.true(topIssues.rateLimit.resetAt.getTime() > 0)
+  t.true(topIssues.endCursor.length > 0)
+  t.true(topIssues.issues.length <= 10)
 })
 
 test('fail to search top issues with invalid variables', async t => {

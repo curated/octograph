@@ -1,8 +1,11 @@
 export const edges = {
   data: {
+    rateLimit: {
+      remaining: 4999,
+      resetAt: '2018-03-06T20:05:51Z',
+    },
     search: {
       pageInfo: {
-        hasNextPage: true,
         endCursor: 'Y3Vyc29yOjM=',
       },
       edges: [
