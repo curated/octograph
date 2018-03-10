@@ -10,6 +10,7 @@ test('rate limit', async t => {
 })
 
 test('page info', async t => {
+  t.is(topIssues.issueCount, 3)
   t.is(topIssues.endCursor, 'Y3Vyc29yOjM=')
 })
 

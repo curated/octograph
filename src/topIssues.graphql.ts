@@ -6,6 +6,7 @@ export const query = gql`
       ...rateLimit
     }
     search(type: ISSUE, query: $query, first: $first, after: $after) {
+      issueCount
       pageInfo {
         ...pageInfo
       }

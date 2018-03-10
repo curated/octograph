@@ -5,6 +5,7 @@ export const edges = {
       resetAt: '2018-03-06T20:05:51Z',
     },
     search: {
+      issueCount: 3,
       pageInfo: {
         endCursor: 'Y3Vyc29yOjM=',
       },

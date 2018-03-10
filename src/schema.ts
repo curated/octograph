@@ -11,6 +11,7 @@ export interface Variables {
 
 export interface TopIssues {
   rateLimit: RateLimit
+  issueCount: number
   endCursor: string
   issues: IssueSchema[]
 }

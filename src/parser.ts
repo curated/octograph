@@ -14,6 +14,7 @@ export const parse = (res: any): TopIssues => {
 
   return {
     rateLimit: parseRateLimit(rateLimit),
+    issueCount: search.issueCount,
     endCursor: pageInfo.endCursor,
     issues: parseIssues(search.edges),
   }
