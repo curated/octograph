@@ -3,12 +3,18 @@ package indexer
 import (
 	"io/ioutil"
 	"time"
+
+	"github.com/curated/octograph/logger"
 )
 
 const (
-	issueMappingJSON = "./indexer/issue.json"
-	issueIndexName   = "issue"
-	issueIndexType   = "issue"
+	// IssueIndex in Elastic
+	IssueIndex = "issue"
+
+	// IssueType in Elastic
+	IssueType = "issue"
+
+	mappingJSON = "./indexer/issue.json"
 )
 
 // Issue serialization structure for indexing
@@ -43,9 +49,11 @@ type Issue struct {
 	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
-func issueMapping() (string, error) {
-	b, err := ioutil.ReadFile(issueMappingJSON)
+// IssueMapping in Elastic
+func IssueMapping() (string, error) {
+	b, err := ioutil.ReadFile(mappingJSON)
 	if err != nil {
+		logger.New().Printf("Failed reading '%s' with error: %v", mappingJSON, err)
 		return "", err
 	}
 	return string(b), nil
