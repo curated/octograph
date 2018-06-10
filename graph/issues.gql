@@ -1,4 +1,4 @@
-query TopIssues($after: String) {
+query Issues($after: String) {
   search(type: ISSUE, query: "reactions:>100", first: 10, after: $after) {
     issueCount
     pageInfo {
@@ -30,11 +30,11 @@ fragment issue on Issue {
   reactionGroups {
     ...reactionGroup
   }
-  repository {
-    ...repository
-  }
   author {
     ...actor
+  }
+  repository {
+    ...repository
   }
 }
 
@@ -42,24 +42,6 @@ fragment reactionGroup on ReactionGroup {
   content
   users {
     totalCount
-  }
-}
-
-fragment repository on Repository {
-  id
-  url
-  name
-  primaryLanguage {
-    name
-  }
-  forks {
-    totalCount
-  }
-  stargazers {
-    totalCount
-  }
-  owner {
-    ...user
   }
 }
 
@@ -94,4 +76,22 @@ fragment actorProps on Actor {
   url
   login
   avatarUrl
+}
+
+fragment repository on Repository {
+  id
+  url
+  name
+  primaryLanguage {
+    name
+  }
+  forks {
+    totalCount
+  }
+  stargazers {
+    totalCount
+  }
+  owner {
+    ...user
+  }
 }

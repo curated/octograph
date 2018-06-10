@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-const topIssuesGQL = "./graph/TopIssues.gql"
+const issuesGQL = "./graph/issues.gql"
 
-// FetchTopIssues after optional end cursor
-func (g *Graph) FetchTopIssues(endCursor *string) (*TopIssues, error) {
-	g.Logger.Printf("Fetching top issues after cursor: %v", endCursor)
+// FetchIssues after optional end cursor
+func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
+	g.Logger.Printf("Fetching issues after cursor: %v", endCursor)
 
-	query, err := ioutil.ReadFile(topIssuesGQL)
+	query, err := ioutil.ReadFile(issuesGQL)
 	if err != nil {
-		g.Logger.Printf("Failed reading '%s' with error: %v", topIssuesGQL, err)
+		g.Logger.Printf("Failed reading '%s' with error: %v", issuesGQL, err)
 		return nil, err
 	}
 
@@ -22,22 +22,22 @@ func (g *Graph) FetchTopIssues(endCursor *string) (*TopIssues, error) {
 		"after": endCursor,
 	})
 	if err != nil {
-		g.Logger.Printf("Failed fetching top issues: %v", err)
+		g.Logger.Printf("Failed fetching issues: %v", err)
 		return nil, err
 	}
 
-	var ti TopIssues
-	err = json.Unmarshal(res, &ti)
+	var issues Issues
+	err = json.Unmarshal(res, &issues)
 	if err != nil {
-		g.Logger.Printf("Failed parsing top issues: %v", err)
+		g.Logger.Printf("Failed parsing issues: %v", err)
 		return nil, err
 	}
 
-	return &ti, nil
+	return &issues, nil
 }
 
-// TopIssues response structure from GraphQL endpoint
-type TopIssues struct {
+// Issues response structure from GraphQL endpoint
+type Issues struct {
 	Data struct {
 		Search struct {
 			IssueCount int
