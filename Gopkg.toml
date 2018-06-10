@@ -3,3 +3,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "github.com/olivere/elastic"
+  version = "6.1.23"
