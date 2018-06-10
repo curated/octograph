@@ -1,8 +1,6 @@
 default: test
-.PHONY: dist test run
 
-dist:
-	@docker build -t octograph .
+.PHONY: test run
 
 test:
 	@go test ./...

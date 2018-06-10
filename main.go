@@ -1,7 +1,7 @@
 package main
 
-import "github.com/curated/octograph/server"
+import "github.com/curated/octograph/worker"
 
 func main() {
-	server.New().Start()
+	worker.New().Process()
 }
