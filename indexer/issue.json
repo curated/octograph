@@ -13,7 +13,7 @@
           "type": "text"
         },
         "number": {
-          "type": "int"
+          "type": "integer"
         },
         "title": {
           "type": "text"
@@ -25,22 +25,22 @@
           "type": "keyword"
         },
         "thumbsUp": {
-          "type": "int"
+          "type": "integer"
         },
         "thumbsDown": {
-          "type": "int"
+          "type": "integer"
         },
         "laugh": {
-          "type": "int"
+          "type": "integer"
         },
         "hooray": {
-          "type": "int"
+          "type": "integer"
         },
         "confused": {
-          "type": "int"
+          "type": "integer"
         },
         "heart": {
-          "type": "int"
+          "type": "integer"
         },
         "authorId": {
           "type": "keyword"
@@ -67,10 +67,10 @@
           "type": "keyword"
         },
         "repoForks": {
-          "type": "int"
+          "type": "integer"
         },
         "repoStargazers": {
-          "type": "int"
+          "type": "integer"
         },
         "repoOwnerId": {
           "type": "keyword"
