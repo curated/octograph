@@ -17,6 +17,7 @@ const endpoint = "https://api.github.com/graphql"
 // New creates a new graph client
 func New() *Graph {
 	return &Graph{
+		Client: &http.Client{},
 		Config: config.Load(),
 		Logger: logger.New(),
 	}
@@ -24,6 +25,7 @@ func New() *Graph {
 
 // Graph client
 type Graph struct {
+	Client *http.Client
 	Config *config.Config
 	Logger *log.Logger
 }
@@ -35,15 +37,12 @@ type ReqBody struct {
 }
 
 func (g *Graph) fetch(query []byte, variables map[string]interface{}) ([]byte, error) {
-	g.Logger.Printf("Query:\n%s", string(query))
-	g.Logger.Printf("Variables: %v", variables)
-
 	reqBody, err := json.Marshal(&ReqBody{
 		Query:     string(query),
 		Variables: variables,
 	})
 	if err != nil {
-		g.Logger.Printf("Failed parsing request body: %v", err)
+		g.Logger.Printf("Failed parsing request body: %v\n%s\n%v", err, string(query), variables)
 		return []byte{}, err
 	}
 
@@ -62,8 +61,7 @@ func (g *Graph) fetch(query []byte, variables map[string]interface{}) ([]byte, e
 		fmt.Sprintf("Bearer %s", g.Config.GitHub.Token),
 	)
 
-	cli := http.Client{}
-	res, err := cli.Do(req)
+	res, err := g.Client.Do(req)
 	if err != nil {
 		g.Logger.Printf("Failed processing request: %v", err)
 		return []byte{}, err
@@ -75,7 +73,5 @@ func (g *Graph) fetch(query []byte, variables map[string]interface{}) ([]byte, e
 		return []byte{}, err
 	}
 
-	g.Logger.Printf("Response headers: %v", res.Header)
-	g.Logger.Printf("Response body:\n%s", string(resBody))
 	return resBody, nil
 }

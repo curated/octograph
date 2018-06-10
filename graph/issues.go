@@ -10,8 +10,6 @@ const issuesGQL = "./graph/issues.gql"
 
 // FetchIssues after optional end cursor
 func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
-	g.Logger.Printf("Fetching issues after cursor: %v", endCursor)
-
 	query, err := ioutil.ReadFile(issuesGQL)
 	if err != nil {
 		g.Logger.Printf("Failed reading '%s' with error: %v", issuesGQL, err)
@@ -29,7 +27,7 @@ func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
 	var issues Issues
 	err = json.Unmarshal(res, &issues)
 	if err != nil {
-		g.Logger.Printf("Failed parsing issues: %v", err)
+		g.Logger.Printf("Failed parsing issues: %v\n%s", err, string(res))
 		return nil, err
 	}
 
