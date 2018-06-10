@@ -1,4 +1,9 @@
 {
+  "Elastic": {
+    "URL": "",
+    "Username": "",
+    "Password": ""
+  },
   "GitHub": {
     "Token": ""
   }

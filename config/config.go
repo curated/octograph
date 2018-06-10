@@ -9,6 +9,11 @@ import (
 
 // Config values
 type Config struct {
+	Elastic struct {
+		URL      string
+		Username string
+		Password string
+	}
 	GitHub struct {
 		Token string
 	}
