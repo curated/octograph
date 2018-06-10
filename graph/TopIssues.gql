@@ -1,8 +1,5 @@
 query TopIssues($after: String) {
-  rateLimit {
-    ...rateLimit
-  }
-  search(type: ISSUE, query: "reactions:>1000", first: 10, after: $after) {
+  search(type: ISSUE, query: "reactions:>100", first: 10, after: $after) {
     issueCount
     pageInfo {
       ...pageInfo
@@ -15,11 +12,6 @@ query TopIssues($after: String) {
       }
     }
   }
-}
-
-fragment rateLimit on RateLimit {
-  remaining
-  resetAt
 }
 
 fragment pageInfo on PageInfo {
@@ -38,18 +30,36 @@ fragment issue on Issue {
   reactionGroups {
     ...reactionGroup
   }
+  repository {
+    ...repository
+  }
   author {
     ...actor
   }
-  # repository {
-  #  ...repository
-  # }
 }
 
 fragment reactionGroup on ReactionGroup {
   content
   users {
     totalCount
+  }
+}
+
+fragment repository on Repository {
+  id
+  url
+  name
+  primaryLanguage {
+    name
+  }
+  forks {
+    totalCount
+  }
+  stargazers {
+    totalCount
+  }
+  owner {
+    ...user
   }
 }
 
@@ -64,24 +74,6 @@ fragment actor on Actor {
     ...bot
   }
 }
-
-# fragment repository on Repository {
-#   id
-#   url
-#   name
-#   primaryLanguage {
-#     name
-#   }
-#   forks {
-#     totalCount
-#   }
-#   stargazers {
-#     totalCount
-#   }
-#   owner {
-#     ...user
-#   }
-# }
 
 fragment user on User {
   id
