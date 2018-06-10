@@ -24,7 +24,7 @@ type IssueWorker struct {
 	Logger  *log.Logger
 }
 
-// Process indexing of issues
+// Process GraphQL nodes into Elastic documents
 func (w *IssueWorker) Process() error {
 	mapping, err := indexer.IssueMapping()
 	if err != nil {
@@ -34,11 +34,10 @@ func (w *IssueWorker) Process() error {
 	if err != nil {
 		return err
 	}
-	return w.ProcessCursor(nil)
+	return w.processCursor(nil)
 }
 
-// ProcessCursor recursively
-func (w *IssueWorker) ProcessCursor(endCursor *string) error {
+func (w *IssueWorker) processCursor(endCursor *string) error {
 	w.Logger.Printf("Processing cursor: %v", endCursor)
 	graphIssues, err := w.Graph.FetchIssues(endCursor)
 	if err != nil {
@@ -48,7 +47,7 @@ func (w *IssueWorker) ProcessCursor(endCursor *string) error {
 		if len(edge.Node.ID) == 0 {
 			continue
 		}
-		doc := w.Parse(edge.Node)
+		doc := w.parse(edge.Node)
 		err = w.Indexer.Index(
 			indexer.IssueIndex,
 			indexer.IssueType,
@@ -60,13 +59,12 @@ func (w *IssueWorker) ProcessCursor(endCursor *string) error {
 		}
 	}
 	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
-		w.ProcessCursor(&graphIssues.Data.Search.PageInfo.EndCursor)
+		return w.processCursor(&graphIssues.Data.Search.PageInfo.EndCursor)
 	}
 	return nil
 }
 
-// Parse GraphQL node into Elastic document
-func (w *IssueWorker) Parse(node graph.Issue) *indexer.Issue {
+func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
 	return &indexer.Issue{
 		ID:              node.ID,
 		URL:             node.URL,

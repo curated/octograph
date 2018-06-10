@@ -1,7 +1,14 @@
 package main
 
-import "github.com/curated/octograph/worker"
+import (
+	"os"
+
+	"github.com/curated/octograph/worker"
+)
 
 func main() {
-	worker.New().Process()
+	err := worker.NewIssueWorker().Process()
+	if err != nil {
+		os.Exit(1)
+	}
 }
