@@ -1,0 +1,96 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "issue": {
+      "properties": {
+        "id": {
+          "type": "keyword"
+        },
+        "url": {
+          "type": "text"
+        },
+        "number": {
+          "type": "int"
+        },
+        "title": {
+          "type": "text"
+        },
+        "bodyText": {
+          "type": "text"
+        },
+        "state": {
+          "type": "keyword"
+        },
+        "thumbsUp": {
+          "type": "int"
+        },
+        "thumbsDown": {
+          "type": "int"
+        },
+        "laugh": {
+          "type": "int"
+        },
+        "hooray": {
+          "type": "int"
+        },
+        "confused": {
+          "type": "int"
+        },
+        "heart": {
+          "type": "int"
+        },
+        "authorId": {
+          "type": "keyword"
+        },
+        "authorUrl": {
+          "type": "text"
+        },
+        "authorLogin": {
+          "type": "keyword"
+        },
+        "authorAvatar": {
+          "type": "text"
+        },
+        "repoId": {
+          "type": "keyword"
+        },
+        "repoUrl": {
+          "type": "text"
+        },
+        "repoName": {
+          "type": "keyword"
+        },
+        "repoLanguage": {
+          "type": "keyword"
+        },
+        "repoForks": {
+          "type": "int"
+        },
+        "repoStargazers": {
+          "type": "int"
+        },
+        "repoOwnerId": {
+          "type": "keyword"
+        },
+        "repoOwnerUrl": {
+          "type": "text"
+        },
+        "repoOwnerLogin": {
+          "type": "keyword"
+        },
+        "repoOwnerAvatar": {
+          "type": "text"
+        },
+        "createdAt": {
+          "type": "date"
+        },
+        "updatedAt": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
