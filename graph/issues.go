@@ -47,57 +47,60 @@ type Issues struct {
 			}
 
 			Edges []struct {
-				Node struct {
-					ID        string
-					URL       string
-					Number    int
-					Title     string
-					BodyText  string
-					State     string
-					CreatedAt time.Time
-					UpdatedAt time.Time
-
-					ReactionGroups []struct {
-						Content string
-
-						Users struct {
-							TotalCount int
-						}
-					}
-
-					Repository struct {
-						ID   string
-						URL  string
-						Name string
-
-						PrimaryLanguage struct {
-							Name string
-						}
-
-						Forks struct {
-							TotalCount int
-						}
-
-						Stargazers struct {
-							TotalCount int
-						}
-
-						Owner struct {
-							ID        string
-							URL       string
-							Name      string
-							AvatarURL string
-						}
-					}
-
-					Author struct {
-						ID        string
-						URL       string
-						Login     string
-						AvatarURL string
-					}
-				}
+				Node Issue
 			}
 		}
+	}
+}
+
+// Issue node structure from GraphQL endpoint
+type Issue struct {
+	ID        string
+	URL       string
+	Number    int
+	Title     string
+	BodyText  string
+	State     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	ReactionGroups []struct {
+		Content string
+
+		Users struct {
+			TotalCount int
+		}
+	}
+
+	Repository struct {
+		ID   string
+		URL  string
+		Name string
+
+		PrimaryLanguage struct {
+			Name string
+		}
+
+		Forks struct {
+			TotalCount int
+		}
+
+		Stargazers struct {
+			TotalCount int
+		}
+
+		Owner struct {
+			ID        string
+			URL       string
+			Login     string
+			AvatarURL string
+		}
+	}
+
+	Author struct {
+		ID        string
+		URL       string
+		Login     string
+		AvatarURL string
 	}
 }
