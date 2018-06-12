@@ -16,7 +16,7 @@ func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
 		return nil, err
 	}
 
-	res, err := g.fetch(query, map[string]interface{}{
+	res, err := g.Fetch(query, map[string]interface{}{
 		"after": endCursor,
 	})
 	if err != nil {

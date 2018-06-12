@@ -36,14 +36,15 @@ type ReqBody struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-func (g *Graph) fetch(query []byte, variables map[string]interface{}) ([]byte, error) {
+// Fetch GraphQL data using query and variables
+func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, error) {
 	reqBody, err := json.Marshal(&ReqBody{
 		Query:     string(query),
 		Variables: variables,
 	})
 	if err != nil {
 		g.Logger.Printf("Failed parsing request body: %v\n%s\n%v", err, string(query), variables)
-		return []byte{}, err
+		return nil, err
 	}
 
 	req, err := http.NewRequest(
@@ -53,7 +54,7 @@ func (g *Graph) fetch(query []byte, variables map[string]interface{}) ([]byte, e
 	)
 	if err != nil {
 		g.Logger.Printf("Failed creating request: %v", err)
-		return []byte{}, err
+		return nil, err
 	}
 
 	req.Header.Add(
@@ -64,13 +65,13 @@ func (g *Graph) fetch(query []byte, variables map[string]interface{}) ([]byte, e
 	res, err := g.Client.Do(req)
 	if err != nil {
 		g.Logger.Printf("Failed processing request: %v", err)
-		return []byte{}, err
+		return nil, err
 	}
 
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		g.Logger.Printf("Failed reading response body: %v", err)
-		return []byte{}, err
+		return nil, err
 	}
 
 	return resBody, nil
