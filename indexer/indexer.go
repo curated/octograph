@@ -13,7 +13,7 @@ import (
 
 // New create a new indexer
 func New() *Indexer {
-	cfg := config.Load()
+	cfg := config.New()
 	lg := logger.New()
 
 	cli, err := elastic.NewClient(
@@ -81,15 +81,6 @@ func (i *Indexer) Delete(index string) error {
 		return fmt.Errorf("Index removal was not acknowledged: %v", res)
 	}
 	return nil
-}
-
-// Recreate index
-func (i *Indexer) Recreate(index, mapping string) error {
-	err := i.Delete(index)
-	if err != nil {
-		return err
-	}
-	return i.Create(index, mapping)
 }
 
 // Index a document
