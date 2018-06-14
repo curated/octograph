@@ -72,12 +72,12 @@ func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
 		Title:           node.Title,
 		BodyText:        node.BodyText,
 		State:           node.State,
-		ThumbsUp:        node.ReactionGroups[0].Users.TotalCount,
-		ThumbsDown:      node.ReactionGroups[1].Users.TotalCount,
-		Laugh:           node.ReactionGroups[2].Users.TotalCount,
-		Hooray:          node.ReactionGroups[3].Users.TotalCount,
-		Confused:        node.ReactionGroups[4].Users.TotalCount,
-		Heart:           node.ReactionGroups[5].Users.TotalCount,
+		ThumbsUp:        w.get("THUMBS_UP", node.ReactionGroups),
+		ThumbsDown:      w.get("THUMBS_DOWN", node.ReactionGroups),
+		Laugh:           w.get("LAUGH", node.ReactionGroups),
+		Hooray:          w.get("HOORAY", node.ReactionGroups),
+		Confused:        w.get("CONFUSED", node.ReactionGroups),
+		Heart:           w.get("HEART", node.ReactionGroups),
 		AuthorID:        node.Author.ID,
 		AuthorURL:       node.Author.URL,
 		AuthorLogin:     node.Author.Login,
@@ -95,4 +95,13 @@ func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
 		CreatedAt:       node.CreatedAt,
 		UpdatedAt:       node.UpdatedAt,
 	}
+}
+
+func (w *IssueWorker) get(key string, groups []graph.ReactionGroup) int {
+	for _, g := range groups {
+		if key == g.Content {
+			return g.Users.TotalCount
+		}
+	}
+	return 0
 }
