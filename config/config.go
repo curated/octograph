@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 )
 
 // Config values
@@ -19,18 +20,23 @@ type Config struct {
 	}
 }
 
-// Load config from ENV or default file
-func Load() *Config {
+// New creates config from ENV or default file
+func New() *Config {
 	f := filename()
 	return parse(read(f), f)
+}
+
+// GetPath returns absolute path to given relative path
+func GetPath(p string) string {
+	return path.Join(os.Getenv("GOPATH"), "src/github.com/curated/octograph", p)
 }
 
 func filename() string {
 	f := os.Getenv("CONFIG")
 	if len(f) == 0 {
-		return "./config/config.json"
+		return GetPath("config/config.prod.json")
 	}
-	return f
+	return GetPath(f)
 }
 
 func read(f string) []byte {
