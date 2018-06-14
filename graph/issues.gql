@@ -1,5 +1,5 @@
 query Issues($after: String) {
-  search(type: ISSUE, query: "reactions:>100", first: 10, after: $after) {
+  search(type: ISSUE, query: "reactions:>1000", first: 10, after: $after) {
     issueCount
     pageInfo {
       ...pageInfo

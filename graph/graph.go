@@ -18,7 +18,7 @@ const endpoint = "https://api.github.com/graphql"
 func New() *Graph {
 	return &Graph{
 		Client: &http.Client{},
-		Config: config.Load(),
+		Config: config.New(),
 		Logger: logger.New(),
 	}
 }

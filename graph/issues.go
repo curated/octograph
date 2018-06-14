@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"time"
-)
 
-const issuesGQL = "./graph/issues.gql"
+	"github.com/curated/octograph/config"
+)
 
 // FetchIssues after optional end cursor
 func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
+	issuesGQL := config.GetPath("graph/issues.gql")
 	query, err := ioutil.ReadFile(issuesGQL)
 	if err != nil {
 		g.Logger.Printf("Failed reading '%s' with error: %v", issuesGQL, err)
@@ -62,13 +63,7 @@ type Issue struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	ReactionGroups []struct {
-		Content string
-
-		Users struct {
-			TotalCount int
-		}
-	}
+	ReactionGroups []ReactionGroup
 
 	Repository struct {
 		ID   string
@@ -100,5 +95,14 @@ type Issue struct {
 		URL       string
 		Login     string
 		AvatarURL string
+	}
+}
+
+// ReactionGroup node structure from GraphQL
+type ReactionGroup struct {
+	Content string
+
+	Users struct {
+		TotalCount int
 	}
 }

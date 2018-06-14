@@ -2,7 +2,6 @@ package graph_test
 
 import (
 	"encoding/json"
-	"os"
 	"testing"
 
 	"github.com/curated/octograph/graph"
@@ -10,13 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setup(t *testing.T) {
-	err := os.Setenv("CONFIG", "../config/config.json")
-	assert.Nil(t, err)
-}
-
 func TestFetch(t *testing.T) {
-	setup(t)
 	g := graph.New()
 
 	query := []byte(`
@@ -47,7 +40,6 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchWithVariable(t *testing.T) {
-	setup(t)
 	g := graph.New()
 
 	query := []byte(`
