@@ -43,7 +43,7 @@ func filename() string {
 func read(f string) []byte {
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
-		glog.Fatalf("Failed loadig '%s' with error: %v", f, err)
+		glog.Fatalf("Failed loading '%s' with error: %v", f, err)
 	}
 	return b
 }
