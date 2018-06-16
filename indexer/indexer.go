@@ -9,6 +9,11 @@ import (
 	"github.com/olivere/elastic"
 )
 
+const (
+	elasticScheme   = "https"
+	elasticSniffing = false
+)
+
 // New create a new indexer
 func New() *Indexer {
 	cfg := config.New()
@@ -16,8 +21,8 @@ func New() *Indexer {
 	cli, err := elastic.NewClient(
 		elastic.SetURL(cfg.Elastic.URL),
 		elastic.SetBasicAuth(cfg.Elastic.Username, cfg.Elastic.Password),
-		elastic.SetScheme("https"),
-		elastic.SetSniff(false),
+		elastic.SetScheme(elasticScheme),
+		elastic.SetSniff(elasticSniffing),
 	)
 
 	if err != nil {
