@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	"os"
+
+	"github.com/golang/glog"
 
 	"github.com/curated/octograph/worker"
 )
@@ -11,6 +12,6 @@ func main() {
 	flag.Parse()
 	err := worker.NewIssueWorker().Process()
 	if err != nil {
-		os.Exit(1)
+		glog.Fatalf("Failed running issue worker: %v", err)
 	}
 }
