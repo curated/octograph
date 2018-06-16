@@ -3,6 +3,8 @@ package indexer
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"time"
 
 	"github.com/curated/octograph/config"
 	"github.com/golang/glog"
@@ -10,6 +12,12 @@ import (
 )
 
 const (
+	// IssueIndex in Elastic
+	IssueIndex = "issue"
+
+	// IssueType in Elastic
+	IssueType = "issue"
+
 	elasticScheme   = "https"
 	elasticSniffing = false
 )
@@ -21,13 +29,43 @@ type Indexer struct {
 	Config  *config.Config
 }
 
-// New create a new indexer
-func New() *Indexer {
-	cfg := config.New()
+// Issue serialization structure for indexing
+type Issue struct {
+	ID              string    `json:"id"`
+	URL             string    `json:"url"`
+	Number          int       `json:"number"`
+	Title           string    `json:"title"`
+	BodyText        string    `json:"bodyText"`
+	State           string    `json:"state"`
+	ThumbsUp        int       `json:"thumbsUp"`
+	ThumbsDown      int       `json:"thumbsDown"`
+	Laugh           int       `json:"laugh"`
+	Hooray          int       `json:"hooray"`
+	Confused        int       `json:"confused"`
+	Heart           int       `json:"heart"`
+	AuthorID        string    `json:"authorId"`
+	AuthorURL       string    `json:"authorUrl"`
+	AuthorLogin     string    `json:"authorLogin"`
+	AuthorAvatar    string    `json:"authorAvatar"`
+	RepoID          string    `json:"repoId"`
+	RepoURL         string    `json:"repoUrl"`
+	RepoName        string    `json:"repoName"`
+	RepoLanguage    string    `json:"repoLanguage"`
+	RepoForks       int       `json:"repoForks"`
+	RepoStargazers  int       `json:"repoStargazers"`
+	RepoOwnerID     string    `json:"repoOwnerId"`
+	RepoOwnerURL    string    `json:"repoOwnerUrl"`
+	RepoOwnerLogin  string    `json:"repoOwnerLogin"`
+	RepoOwnerAvatar string    `json:"repoOwnerAvatar"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+}
 
+// New create a new indexer
+func New(c *config.Config) *Indexer {
 	cli, err := elastic.NewClient(
-		elastic.SetURL(cfg.Elastic.URL),
-		elastic.SetBasicAuth(cfg.Elastic.Username, cfg.Elastic.Password),
+		elastic.SetURL(c.Elastic.URL),
+		elastic.SetBasicAuth(c.Elastic.Username, c.Elastic.Password),
 		elastic.SetScheme(elasticScheme),
 		elastic.SetSniff(elasticSniffing),
 	)
@@ -39,7 +77,7 @@ func New() *Indexer {
 	return &Indexer{
 		Context: context.Background(),
 		Client:  cli,
-		Config:  cfg,
+		Config:  c,
 	}
 }
 
@@ -106,4 +144,17 @@ func (i *Indexer) Index(name, typ, id string, body interface{}) error {
 	}
 
 	return nil
+}
+
+// IssueMapping in Elastic
+func (i *Indexer) IssueMapping() (string, error) {
+	mappingJSON := i.Config.GetPath("indexer/issue_mapping.json")
+	b, err := ioutil.ReadFile(mappingJSON)
+
+	if err != nil {
+		glog.Errorf("Failed reading '%s' with error: %v", mappingJSON, err)
+		return "", err
+	}
+
+	return string(b), nil
 }

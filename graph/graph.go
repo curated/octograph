@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/curated/octograph/config"
 	"github.com/golang/glog"
@@ -25,11 +26,83 @@ type ReqBody struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
+// Issues response structure from GraphQL
+type Issues struct {
+	Data struct {
+		Search struct {
+			IssueCount int
+
+			PageInfo struct {
+				EndCursor string
+			}
+
+			Edges []struct {
+				Node Issue
+			}
+		}
+	}
+}
+
+// Issue node structure from GraphQL
+type Issue struct {
+	ID        string
+	URL       string
+	Number    int
+	Title     string
+	BodyText  string
+	State     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	ReactionGroups []ReactionGroup
+
+	Repository struct {
+		ID   string
+		URL  string
+		Name string
+
+		PrimaryLanguage struct {
+			Name string
+		}
+
+		Forks struct {
+			TotalCount int
+		}
+
+		Stargazers struct {
+			TotalCount int
+		}
+
+		Owner struct {
+			ID        string
+			URL       string
+			Login     string
+			AvatarURL string
+		}
+	}
+
+	Author struct {
+		ID        string
+		URL       string
+		Login     string
+		AvatarURL string
+	}
+}
+
+// ReactionGroup node structure from GraphQL
+type ReactionGroup struct {
+	Content string
+
+	Users struct {
+		TotalCount int
+	}
+}
+
 // New creates a new graph client
-func New() *Graph {
+func New(c *config.Config) *Graph {
 	return &Graph{
 		Client: &http.Client{},
-		Config: config.New(),
+		Config: c,
 	}
 }
 
@@ -78,4 +151,35 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 	}
 
 	return resBody, nil
+}
+
+// FetchIssues by query, after optional end cursor
+func (g *Graph) FetchIssues(query string, endCursor *string) (*Issues, error) {
+	issuesGQL := g.Config.GetPath("graph/issues_query.gql")
+	b, err := ioutil.ReadFile(issuesGQL)
+
+	if err != nil {
+		glog.Errorf("Failed reading '%s' with error: %v", issuesGQL, err)
+		return nil, err
+	}
+
+	res, err := g.Fetch(b, map[string]interface{}{
+		"query": query,
+		"after": endCursor,
+	})
+
+	if err != nil {
+		glog.Errorf("Failed fetching issues: %v", err)
+		return nil, err
+	}
+
+	var issues Issues
+	err = json.Unmarshal(res, &issues)
+
+	if err != nil {
+		glog.Errorf("Failed parsing issues: %v\n%s", err, string(res))
+		return nil, err
+	}
+
+	return &issues, nil
 }

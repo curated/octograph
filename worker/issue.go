@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"github.com/curated/octograph/config"
 	"github.com/curated/octograph/graph"
 	"github.com/curated/octograph/indexer"
 	"github.com/golang/glog"
@@ -22,16 +23,16 @@ type IssueWorker struct {
 }
 
 // NewIssueWorker creates a new issue worker
-func NewIssueWorker() *IssueWorker {
+func NewIssueWorker(c *config.Config) *IssueWorker {
 	return &IssueWorker{
-		Graph:   graph.New(),
-		Indexer: indexer.New(),
+		Graph:   graph.New(c),
+		Indexer: indexer.New(c),
 	}
 }
 
 // Process GraphQL nodes into Elastic documents
 func (w *IssueWorker) Process(query string) error {
-	mapping, err := indexer.IssueMapping()
+	mapping, err := w.Indexer.IssueMapping()
 
 	if err != nil {
 		glog.Errorf("Failed loading issue mapping: %v", err)

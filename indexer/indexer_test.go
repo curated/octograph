@@ -1,14 +1,17 @@
 package indexer_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
 
+	"github.com/curated/octograph/config"
 	"github.com/curated/octograph/indexer"
 	"github.com/stretchr/testify/assert"
 )
 
-var idx = indexer.New()
+var idx = indexer.New(config.New("../"))
 var index = "test"
 
 func TestMain(m *testing.M) {
@@ -16,12 +19,14 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+
 	if exists {
-		_, err := idx.Client.DeleteIndex(index).Do(idx.Context)
+		res, err := idx.Client.DeleteIndex(index).Do(idx.Context)
 		if err != nil {
-			panic(err)
+			panic(fmt.Sprintf("Delete acknowledged: %v, error: %v", res.Acknowledged, err))
 		}
 	}
+
 	os.Exit(m.Run())
 }
 
@@ -35,7 +40,8 @@ func TestCreate(t *testing.T) {
 }
 
 func TestEnsure(t *testing.T) {
-	_, err := idx.Client.DeleteIndex(index).Do(idx.Context)
+	res, err := idx.Client.DeleteIndex(index).Do(idx.Context)
+	assert.True(t, res.Acknowledged)
 	assert.Nil(t, err)
 
 	for i := 1; i <= 2; i++ {
@@ -58,21 +64,16 @@ func TestDelete(t *testing.T) {
 }
 
 func TestIndex(t *testing.T) {
+	res, err := idx.Client.CreateIndex(index).Do(idx.Context)
+	assert.True(t, res.Acknowledged)
+	assert.Nil(t, err)
+
 	sr, err := idx.Client.Search().
 		Index(index).
 		From(0).
 		Size(10).
 		Do(idx.Context)
-	assert.NotNil(t, err)
 
-	_, err = idx.Client.CreateIndex(index).Do(idx.Context)
-	assert.Nil(t, err)
-
-	sr, err = idx.Client.Search().
-		Index(index).
-		From(0).
-		Size(10).
-		Do(idx.Context)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(0), sr.TotalHits())
 
@@ -87,6 +88,18 @@ func TestIndex(t *testing.T) {
 		From(0).
 		Size(10).
 		Do(idx.Context)
+
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), sr.TotalHits())
+}
+
+func TestIssueMapping(t *testing.T) {
+	issueMapping, err := idx.IssueMapping()
+	assert.Nil(t, err)
+
+	var jsonMapping map[string]interface{}
+	err = json.Unmarshal([]byte(issueMapping), &jsonMapping)
+	assert.Nil(t, err)
+
+	assert.True(t, len(issueMapping) > 0)
 }

@@ -4,55 +4,56 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/golang/glog"
 )
 
+const (
+	configKey   = "CONFIG"
+	defaultFile = "config/config.prod.json"
+)
+
 // Config values
 type Config struct {
+	Root string
+
 	Elastic struct {
 		URL      string
 		Username string
 		Password string
 	}
+
 	GitHub struct {
 		Token string
 	}
 }
 
-// New creates config from ENV or default file
-func New() *Config {
-	f := filename()
-	return parse(read(f), f)
-}
-
-// GetPath returns absolute path to given relative path
-func GetPath(p string) string {
-	return path.Join(os.Getenv("GOPATH"), "src/github.com/curated/octograph", p)
-}
-
-func filename() string {
-	f := os.Getenv("CONFIG")
-	if len(f) == 0 {
-		return GetPath("config/config.prod.json")
+// New creates config from ENV or default file at relative path to package root
+func New(root string) *Config {
+	c := Config{
+		Root: root,
 	}
-	return GetPath(f)
-}
 
-func read(f string) []byte {
-	b, err := ioutil.ReadFile(f)
+	f := os.Getenv(configKey)
+	if len(f) == 0 {
+		f = defaultFile
+	}
+
+	b, err := ioutil.ReadFile(c.GetPath(f))
 	if err != nil {
 		glog.Fatalf("Failed loading '%s' with error: %v", f, err)
 	}
-	return b
-}
 
-func parse(b []byte, f string) *Config {
-	var c Config
-	err := json.Unmarshal(b, &c)
+	err = json.Unmarshal(b, &c)
 	if err != nil {
 		glog.Fatalf("Failed parsing '%s' with error: %v", f, err)
 	}
+
 	return &c
+}
+
+// GetPath returns relative path within package root
+func (c *Config) GetPath(path string) string {
+	return filepath.Join(c.Root, path)
 }

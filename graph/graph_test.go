@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/curated/octograph/config"
 	"github.com/curated/octograph/graph"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-	g := graph.New()
+var g = graph.New(config.New("../"))
 
+func TestFetch(t *testing.T) {
 	query := []byte(`
 		query {
 			viewer {
@@ -40,8 +41,6 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchWithVariable(t *testing.T) {
-	g := graph.New()
-
 	query := []byte(`
 		query Organization($login: String!) {
 			organization(login: $login) {
@@ -70,4 +69,19 @@ func TestFetchWithVariable(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "https://github.com/curated", res.Data.Organization.URL)
+}
+
+func TestFetchIssues(t *testing.T) {
+	query := "reactions:>1000"
+	issues, err := g.FetchIssues(query, nil)
+	assert.Nil(t, err)
+
+	assert.True(t, issues.Data.Search.IssueCount > 0)
+	assert.True(t, len(issues.Data.Search.Edges) > 0)
+
+	issuesAfter, err := g.FetchIssues(query, &issues.Data.Search.PageInfo.EndCursor)
+	assert.Nil(t, err)
+
+	assert.True(t, issuesAfter.Data.Search.IssueCount > 0)
+	assert.True(t, len(issuesAfter.Data.Search.Edges) > 0)
 }
