@@ -6,6 +6,15 @@ import (
 	"github.com/golang/glog"
 )
 
+const (
+	reactionThumbsUp   = "THUMBS_UP"
+	reactionThumbsDown = "THUMBS_DOWN"
+	reactionLaugh      = "LAUGH"
+	reactionHooray     = "HOORAY"
+	reactionConfused   = "CONFUSED"
+	reactionHeart      = "HEART"
+)
+
 // NewIssueWorker creates a new issue worker
 func NewIssueWorker() *IssueWorker {
 	return &IssueWorker{
@@ -68,12 +77,12 @@ func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
 		Title:           node.Title,
 		BodyText:        node.BodyText,
 		State:           node.State,
-		ThumbsUp:        w.get("THUMBS_UP", node.ReactionGroups),
-		ThumbsDown:      w.get("THUMBS_DOWN", node.ReactionGroups),
-		Laugh:           w.get("LAUGH", node.ReactionGroups),
-		Hooray:          w.get("HOORAY", node.ReactionGroups),
-		Confused:        w.get("CONFUSED", node.ReactionGroups),
-		Heart:           w.get("HEART", node.ReactionGroups),
+		ThumbsUp:        w.get(reactionThumbsUp, node.ReactionGroups),
+		ThumbsDown:      w.get(reactionThumbsDown, node.ReactionGroups),
+		Laugh:           w.get(reactionLaugh, node.ReactionGroups),
+		Hooray:          w.get(reactionHooray, node.ReactionGroups),
+		Confused:        w.get(reactionConfused, node.ReactionGroups),
+		Heart:           w.get(reactionHeart, node.ReactionGroups),
 		AuthorID:        node.Author.ID,
 		AuthorURL:       node.Author.URL,
 		AuthorLogin:     node.Author.Login,
