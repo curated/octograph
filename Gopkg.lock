@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/golang/glog"
+  packages = ["."]
+  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
+
+[[projects]]
+  branch = "master"
   name = "github.com/mailru/easyjson"
   packages = [
     ".",
@@ -49,6 +55,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "faf90f39b3d9a00d664b43ce5ae63f37d4652b4192cb917d90a384ed2edaa8ef"
+  inputs-digest = "8870f3554334f6915d041252af326dcf3a9a56791fca239fbe758cacf9205c5e"
   solver-name = "gps-cdcl"
   solver-version = 1

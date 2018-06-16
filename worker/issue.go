@@ -1,11 +1,9 @@
 package worker
 
 import (
-	"log"
-
 	"github.com/curated/octograph/graph"
 	"github.com/curated/octograph/indexer"
-	"github.com/curated/octograph/logger"
+	"github.com/golang/glog"
 )
 
 // NewIssueWorker creates a new issue worker
@@ -13,7 +11,6 @@ func NewIssueWorker() *IssueWorker {
 	return &IssueWorker{
 		Graph:   graph.New(),
 		Indexer: indexer.New(),
-		Logger:  logger.New(),
 	}
 }
 
@@ -21,7 +18,6 @@ func NewIssueWorker() *IssueWorker {
 type IssueWorker struct {
 	Graph   *graph.Graph
 	Indexer *indexer.Indexer
-	Logger  *log.Logger
 }
 
 // Process GraphQL nodes into Elastic documents
@@ -38,7 +34,7 @@ func (w *IssueWorker) Process() error {
 }
 
 func (w *IssueWorker) processCursor(endCursor *string) error {
-	w.Logger.Printf("Processing cursor: %v", endCursor)
+	glog.Infof("Processing cursor: %v", endCursor)
 	graphIssues, err := w.Graph.FetchIssues(endCursor)
 	if err != nil {
 		return err

@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/curated/octograph/config"
-	"github.com/curated/octograph/logger"
+	"github.com/golang/glog"
 )
 
 const endpoint = "https://api.github.com/graphql"
@@ -19,7 +18,6 @@ func New() *Graph {
 	return &Graph{
 		Client: &http.Client{},
 		Config: config.New(),
-		Logger: logger.New(),
 	}
 }
 
@@ -27,7 +25,6 @@ func New() *Graph {
 type Graph struct {
 	Client *http.Client
 	Config *config.Config
-	Logger *log.Logger
 }
 
 // ReqBody structure for GraphQL endpoint
@@ -43,7 +40,7 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 		Variables: variables,
 	})
 	if err != nil {
-		g.Logger.Printf("Failed parsing request body: %v\n%s\n%v", err, string(query), variables)
+		glog.Errorf("Failed parsing request body: %v\n%s\n%v", err, string(query), variables)
 		return nil, err
 	}
 
@@ -53,7 +50,7 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 		bytes.NewReader(reqBody),
 	)
 	if err != nil {
-		g.Logger.Printf("Failed creating request: %v", err)
+		glog.Errorf("Failed creating request: %v", err)
 		return nil, err
 	}
 
@@ -64,13 +61,13 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 
 	res, err := g.Client.Do(req)
 	if err != nil {
-		g.Logger.Printf("Failed processing request: %v", err)
+		glog.Errorf("Failed processing request: %v", err)
 		return nil, err
 	}
 
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		g.Logger.Printf("Failed reading response body: %v", err)
+		glog.Errorf("Failed reading response body: %v", err)
 		return nil, err
 	}
 

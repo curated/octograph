@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/curated/octograph/config"
+	"github.com/golang/glog"
 )
 
 // FetchIssues after optional end cursor
@@ -13,7 +14,7 @@ func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
 	issuesGQL := config.GetPath("graph/issues.gql")
 	query, err := ioutil.ReadFile(issuesGQL)
 	if err != nil {
-		g.Logger.Printf("Failed reading '%s' with error: %v", issuesGQL, err)
+		glog.Errorf("Failed reading '%s' with error: %v", issuesGQL, err)
 		return nil, err
 	}
 
@@ -21,14 +22,14 @@ func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
 		"after": endCursor,
 	})
 	if err != nil {
-		g.Logger.Printf("Failed fetching issues: %v", err)
+		glog.Errorf("Failed fetching issues: %v", err)
 		return nil, err
 	}
 
 	var issues Issues
 	err = json.Unmarshal(res, &issues)
 	if err != nil {
-		g.Logger.Printf("Failed parsing issues: %v\n%s", err, string(res))
+		glog.Errorf("Failed parsing issues: %v\n%s", err, string(res))
 		return nil, err
 	}
 

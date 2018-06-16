@@ -3,18 +3,15 @@ package indexer
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/curated/octograph/config"
-	"github.com/curated/octograph/logger"
+	"github.com/golang/glog"
 	"github.com/olivere/elastic"
 )
 
 // New create a new indexer
 func New() *Indexer {
 	cfg := config.New()
-	lg := logger.New()
 
 	cli, err := elastic.NewClient(
 		elastic.SetURL(cfg.Elastic.URL),
@@ -24,15 +21,13 @@ func New() *Indexer {
 	)
 
 	if err != nil {
-		lg.Printf("Failed creating indexer: %v", err)
-		os.Exit(1)
+		glog.Fatalf("Failed creating indexer: %v", err)
 	}
 
 	return &Indexer{
 		Context: context.Background(),
 		Client:  cli,
 		Config:  cfg,
-		Logger:  lg,
 	}
 }
 
@@ -41,14 +36,13 @@ type Indexer struct {
 	Context context.Context
 	Client  *elastic.Client
 	Config  *config.Config
-	Logger  *log.Logger
 }
 
 // Create index
 func (i *Indexer) Create(index, mapping string) error {
 	res, err := i.Client.CreateIndex(index).BodyString(mapping).Do(i.Context)
 	if err != nil {
-		i.Logger.Printf("Failed creating index: %v", err)
+		glog.Errorf("Failed creating index: %v", err)
 		return err
 	}
 	if !res.Acknowledged {
@@ -61,7 +55,7 @@ func (i *Indexer) Create(index, mapping string) error {
 func (i *Indexer) Ensure(index, mapping string) error {
 	exists, err := i.Client.IndexExists(index).Do(i.Context)
 	if err != nil {
-		i.Logger.Printf("Failed checking if index exists: %v", err)
+		glog.Errorf("Failed checking if index exists: %v", err)
 		return err
 	}
 	if !exists {
@@ -74,7 +68,7 @@ func (i *Indexer) Ensure(index, mapping string) error {
 func (i *Indexer) Delete(index string) error {
 	res, err := i.Client.DeleteIndex(index).Do(i.Context)
 	if err != nil {
-		i.Logger.Printf("Failed deleting index: %v", err)
+		glog.Errorf("Failed deleting index: %v", err)
 		return err
 	}
 	if !res.Acknowledged {
@@ -92,7 +86,7 @@ func (i *Indexer) Index(name, typ, id string, body interface{}) error {
 		BodyJson(body).
 		Do(i.Context)
 	if err != nil {
-		i.Logger.Printf("Failed indexing document: %v", err)
+		glog.Errorf("Failed indexing document: %v", err)
 		return err
 	}
 	return nil

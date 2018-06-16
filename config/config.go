@@ -2,10 +2,11 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/golang/glog"
 )
 
 // Config values
@@ -42,8 +43,7 @@ func filename() string {
 func read(f string) []byte {
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
-		fmt.Printf("Failed loadig '%s' with error: %v", f, err)
-		os.Exit(1)
+		glog.Fatalf("Failed loadig '%s' with error: %v", f, err)
 	}
 	return b
 }
@@ -52,8 +52,7 @@ func parse(b []byte, f string) *Config {
 	var c Config
 	err := json.Unmarshal(b, &c)
 	if err != nil {
-		fmt.Printf("Failed parsing '%s' with error: %v", f, err)
-		os.Exit(1)
+		glog.Fatalf("Failed parsing '%s' with error: %v", f, err)
 	}
 	return &c
 }

@@ -9,4 +9,4 @@ test:
 	@CONFIG=config/config.test.json go test ./...
 
 run:
-	@go run main.go
+	@go run main.go -logtostderr=true
