@@ -10,14 +10,14 @@ import (
 
 func TestFetchIssues(t *testing.T) {
 	g := graph.New()
-
-	issues, err := g.FetchIssues(nil)
+	query := "reactions:>1000"
+	issues, err := g.FetchIssues(query, nil)
 	assert.Nil(t, err)
 
 	assert.True(t, issues.Data.Search.IssueCount > 0)
 	assert.True(t, len(issues.Data.Search.Edges) > 0)
 
-	issuesAfter, err := g.FetchIssues(&issues.Data.Search.PageInfo.EndCursor)
+	issuesAfter, err := g.FetchIssues(query, &issues.Data.Search.PageInfo.EndCursor)
 	assert.Nil(t, err)
 
 	assert.True(t, issuesAfter.Data.Search.IssueCount > 0)

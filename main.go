@@ -10,7 +10,7 @@ import (
 
 func main() {
 	flag.Parse()
-	err := worker.NewIssueWorker().Process()
+	err := worker.NewIssueWorker().Process("reactions:>=100")
 	if err != nil {
 		glog.Fatalf("Failed running issue worker: %v", err)
 	}

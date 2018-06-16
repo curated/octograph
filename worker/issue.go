@@ -30,7 +30,7 @@ type IssueWorker struct {
 }
 
 // Process GraphQL nodes into Elastic documents
-func (w *IssueWorker) Process() error {
+func (w *IssueWorker) Process(query string) error {
 	mapping, err := indexer.IssueMapping()
 	if err != nil {
 		glog.Errorf("Failed loading issue mapping: %v", err)
@@ -43,12 +43,12 @@ func (w *IssueWorker) Process() error {
 		return err
 	}
 
-	return w.processCursor(nil)
+	return w.processCursor(query, nil)
 }
 
-func (w *IssueWorker) processCursor(endCursor *string) error {
+func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 	glog.Infof("Processing cursor: %v", endCursor)
-	graphIssues, err := w.Graph.FetchIssues(endCursor)
+	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
 	if err != nil {
 		glog.Errorf("Failed fetching issues: %v", err)
 		return err
@@ -73,7 +73,7 @@ func (w *IssueWorker) processCursor(endCursor *string) error {
 	}
 
 	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
-		return w.processCursor(&graphIssues.Data.Search.PageInfo.EndCursor)
+		return w.processCursor(query, &graphIssues.Data.Search.PageInfo.EndCursor)
 	}
 
 	return nil

@@ -32,6 +32,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestProcess(t *testing.T) {
+	query := "reactions:>3000"
 	sr, err := idx.Client.Search().
 		Index(index).
 		From(0).
@@ -40,7 +41,7 @@ func TestProcess(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int64(0), sr.TotalHits())
 
-	issueWorker.Process()
+	issueWorker.Process(query)
 	assert.Nil(t, err)
 
 	_, err = idx.Client.Flush(index).Do(idx.Context)

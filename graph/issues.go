@@ -9,16 +9,17 @@ import (
 	"github.com/golang/glog"
 )
 
-// FetchIssues after optional end cursor
-func (g *Graph) FetchIssues(endCursor *string) (*Issues, error) {
+// FetchIssues by query, after optional end cursor
+func (g *Graph) FetchIssues(query string, endCursor *string) (*Issues, error) {
 	issuesGQL := config.GetPath("graph/issues.gql")
-	query, err := ioutil.ReadFile(issuesGQL)
+	b, err := ioutil.ReadFile(issuesGQL)
 	if err != nil {
 		glog.Errorf("Failed reading '%s' with error: %v", issuesGQL, err)
 		return nil, err
 	}
 
-	res, err := g.Fetch(query, map[string]interface{}{
+	res, err := g.Fetch(b, map[string]interface{}{
+		"query": query,
 		"after": endCursor,
 	})
 	if err != nil {
