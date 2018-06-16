@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -8,12 +9,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConstructor(t *testing.T) {
+func TestConfig(t *testing.T) {
 	c := config.New()
-	assert.True(t, len(c.Elastic.URL) > 0)
-	assert.True(t, len(c.Elastic.Username) > 0)
-	assert.True(t, len(c.Elastic.Password) > 0)
-	assert.True(t, len(c.GitHub.Token) > 0)
+	assert.NotEmpty(t, c.Elastic.URL)
+	assert.NotEmpty(t, c.Elastic.Username)
+	assert.NotEmpty(t, c.Elastic.Password)
+	assert.NotEmpty(t, c.GitHub.Token)
+}
+
+func TestConfigOverride(t *testing.T) {
+	os.Setenv("CONFIG", "config/config.json")
+	c := config.New()
+	assert.Empty(t, c.Elastic.URL)
+	assert.Empty(t, c.Elastic.Username)
+	assert.Empty(t, c.Elastic.Password)
+	assert.Empty(t, c.GitHub.Token)
 }
 
 func TestGetPath(t *testing.T) {
