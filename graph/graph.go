@@ -71,5 +71,9 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 		return nil, err
 	}
 
+	if res.StatusCode >= http.StatusBadRequest {
+		return nil, fmt.Errorf("Request failed: %s", string(resBody))
+	}
+
 	return resBody, nil
 }
