@@ -52,7 +52,7 @@ func (w *IssueWorker) processCursor(endCursor *string) error {
 		if len(edge.Node.ID) == 0 {
 			continue
 		}
-		doc := w.parse(edge.Node)
+		doc := w.parseIssue(edge.Node)
 		err = w.Indexer.Index(
 			indexer.IssueIndex,
 			indexer.IssueType,
@@ -69,7 +69,16 @@ func (w *IssueWorker) processCursor(endCursor *string) error {
 	return nil
 }
 
-func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
+func (w *IssueWorker) getReaction(key string, groups []graph.ReactionGroup) int {
+	for _, g := range groups {
+		if key == g.Content {
+			return g.Users.TotalCount
+		}
+	}
+	return 0
+}
+
+func (w *IssueWorker) parseIssue(node graph.Issue) *indexer.Issue {
 	return &indexer.Issue{
 		ID:              node.ID,
 		URL:             node.URL,
@@ -77,12 +86,12 @@ func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
 		Title:           node.Title,
 		BodyText:        node.BodyText,
 		State:           node.State,
-		ThumbsUp:        w.get(reactionThumbsUp, node.ReactionGroups),
-		ThumbsDown:      w.get(reactionThumbsDown, node.ReactionGroups),
-		Laugh:           w.get(reactionLaugh, node.ReactionGroups),
-		Hooray:          w.get(reactionHooray, node.ReactionGroups),
-		Confused:        w.get(reactionConfused, node.ReactionGroups),
-		Heart:           w.get(reactionHeart, node.ReactionGroups),
+		ThumbsUp:        w.getReaction(reactionThumbsUp, node.ReactionGroups),
+		ThumbsDown:      w.getReaction(reactionThumbsDown, node.ReactionGroups),
+		Laugh:           w.getReaction(reactionLaugh, node.ReactionGroups),
+		Hooray:          w.getReaction(reactionHooray, node.ReactionGroups),
+		Confused:        w.getReaction(reactionConfused, node.ReactionGroups),
+		Heart:           w.getReaction(reactionHeart, node.ReactionGroups),
 		AuthorID:        node.Author.ID,
 		AuthorURL:       node.Author.URL,
 		AuthorLogin:     node.Author.Login,
@@ -100,13 +109,4 @@ func (w *IssueWorker) parse(node graph.Issue) *indexer.Issue {
 		CreatedAt:       node.CreatedAt,
 		UpdatedAt:       node.UpdatedAt,
 	}
-}
-
-func (w *IssueWorker) get(key string, groups []graph.ReactionGroup) int {
-	for _, g := range groups {
-		if key == g.Content {
-			return g.Users.TotalCount
-		}
-	}
-	return 0
 }
