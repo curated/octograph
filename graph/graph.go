@@ -13,14 +13,6 @@ import (
 
 const endpoint = "https://api.github.com/graphql"
 
-// New creates a new graph client
-func New() *Graph {
-	return &Graph{
-		Client: &http.Client{},
-		Config: config.New(),
-	}
-}
-
 // Graph client
 type Graph struct {
 	Client *http.Client
@@ -33,12 +25,21 @@ type ReqBody struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
+// New creates a new graph client
+func New() *Graph {
+	return &Graph{
+		Client: &http.Client{},
+		Config: config.New(),
+	}
+}
+
 // Fetch GraphQL data using query and variables
 func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, error) {
 	reqBody, err := json.Marshal(&ReqBody{
 		Query:     string(query),
 		Variables: variables,
 	})
+
 	if err != nil {
 		glog.Errorf("Failed parsing request body: %v\n%s\n%v", err, string(query), variables)
 		return nil, err
@@ -49,6 +50,7 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 		endpoint,
 		bytes.NewReader(reqBody),
 	)
+
 	if err != nil {
 		glog.Errorf("Failed creating request: %v", err)
 		return nil, err

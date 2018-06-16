@@ -9,34 +9,6 @@ import (
 	"github.com/golang/glog"
 )
 
-// FetchIssues by query, after optional end cursor
-func (g *Graph) FetchIssues(query string, endCursor *string) (*Issues, error) {
-	issuesGQL := config.GetPath("graph/issues.gql")
-	b, err := ioutil.ReadFile(issuesGQL)
-	if err != nil {
-		glog.Errorf("Failed reading '%s' with error: %v", issuesGQL, err)
-		return nil, err
-	}
-
-	res, err := g.Fetch(b, map[string]interface{}{
-		"query": query,
-		"after": endCursor,
-	})
-	if err != nil {
-		glog.Errorf("Failed fetching issues: %v", err)
-		return nil, err
-	}
-
-	var issues Issues
-	err = json.Unmarshal(res, &issues)
-	if err != nil {
-		glog.Errorf("Failed parsing issues: %v\n%s", err, string(res))
-		return nil, err
-	}
-
-	return &issues, nil
-}
-
 // Issues response structure from GraphQL endpoint
 type Issues struct {
 	Data struct {
@@ -107,4 +79,35 @@ type ReactionGroup struct {
 	Users struct {
 		TotalCount int
 	}
+}
+
+// FetchIssues by query, after optional end cursor
+func (g *Graph) FetchIssues(query string, endCursor *string) (*Issues, error) {
+	issuesGQL := config.GetPath("graph/issues.gql")
+	b, err := ioutil.ReadFile(issuesGQL)
+
+	if err != nil {
+		glog.Errorf("Failed reading '%s' with error: %v", issuesGQL, err)
+		return nil, err
+	}
+
+	res, err := g.Fetch(b, map[string]interface{}{
+		"query": query,
+		"after": endCursor,
+	})
+
+	if err != nil {
+		glog.Errorf("Failed fetching issues: %v", err)
+		return nil, err
+	}
+
+	var issues Issues
+	err = json.Unmarshal(res, &issues)
+
+	if err != nil {
+		glog.Errorf("Failed parsing issues: %v\n%s", err, string(res))
+		return nil, err
+	}
+
+	return &issues, nil
 }

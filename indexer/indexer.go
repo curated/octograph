@@ -14,6 +14,13 @@ const (
 	elasticSniffing = false
 )
 
+// Indexer client
+type Indexer struct {
+	Context context.Context
+	Client  *elastic.Client
+	Config  *config.Config
+}
+
 // New create a new indexer
 func New() *Indexer {
 	cfg := config.New()
@@ -36,49 +43,51 @@ func New() *Indexer {
 	}
 }
 
-// Indexer client
-type Indexer struct {
-	Context context.Context
-	Client  *elastic.Client
-	Config  *config.Config
-}
-
 // Create index
 func (i *Indexer) Create(index, mapping string) error {
 	res, err := i.Client.CreateIndex(index).BodyString(mapping).Do(i.Context)
+
 	if err != nil {
 		glog.Errorf("Failed creating index: %v", err)
 		return err
 	}
+
 	if !res.Acknowledged {
 		return fmt.Errorf("Index creation was not acknowledged: %v", res)
 	}
+
 	return nil
 }
 
 // Ensure index exists
 func (i *Indexer) Ensure(index, mapping string) error {
 	exists, err := i.Client.IndexExists(index).Do(i.Context)
+
 	if err != nil {
 		glog.Errorf("Failed checking if index exists: %v", err)
 		return err
 	}
+
 	if !exists {
 		return i.Create(index, mapping)
 	}
+
 	return nil
 }
 
 // Delete index
 func (i *Indexer) Delete(index string) error {
 	res, err := i.Client.DeleteIndex(index).Do(i.Context)
+
 	if err != nil {
 		glog.Errorf("Failed deleting index: %v", err)
 		return err
 	}
+
 	if !res.Acknowledged {
 		return fmt.Errorf("Index deletion was not acknowledged: %v", res)
 	}
+
 	return nil
 }
 
@@ -90,9 +99,11 @@ func (i *Indexer) Index(name, typ, id string, body interface{}) error {
 		Id(id).
 		BodyJson(body).
 		Do(i.Context)
+
 	if err != nil {
 		glog.Errorf("Failed indexing document: %v", err)
 		return err
 	}
+
 	return nil
 }

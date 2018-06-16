@@ -52,9 +52,11 @@ type Issue struct {
 func IssueMapping() (string, error) {
 	mappingJSON := config.GetPath("indexer/issue_mapping.json")
 	b, err := ioutil.ReadFile(mappingJSON)
+
 	if err != nil {
 		glog.Errorf("Failed reading '%s' with error: %v", mappingJSON, err)
 		return "", err
 	}
+
 	return string(b), nil
 }

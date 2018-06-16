@@ -15,6 +15,12 @@ const (
 	reactionHeart      = "HEART"
 )
 
+// IssueWorker struct
+type IssueWorker struct {
+	Graph   *graph.Graph
+	Indexer *indexer.Indexer
+}
+
 // NewIssueWorker creates a new issue worker
 func NewIssueWorker() *IssueWorker {
 	return &IssueWorker{
@@ -23,15 +29,10 @@ func NewIssueWorker() *IssueWorker {
 	}
 }
 
-// IssueWorker struct
-type IssueWorker struct {
-	Graph   *graph.Graph
-	Indexer *indexer.Indexer
-}
-
 // Process GraphQL nodes into Elastic documents
 func (w *IssueWorker) Process(query string) error {
 	mapping, err := indexer.IssueMapping()
+
 	if err != nil {
 		glog.Errorf("Failed loading issue mapping: %v", err)
 		return err
@@ -48,6 +49,7 @@ func (w *IssueWorker) Process(query string) error {
 
 func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 	glog.Infof("Processing cursor: %v", endCursor)
+
 	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
 	if err != nil {
 		glog.Errorf("Failed fetching issues: %v", err)
@@ -66,6 +68,7 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 			doc.ID,
 			doc,
 		)
+
 		if err != nil {
 			glog.Errorf("Failed indexing issue: %v", err)
 			return err
