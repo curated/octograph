@@ -33,12 +33,16 @@ type IssueWorker struct {
 func (w *IssueWorker) Process() error {
 	mapping, err := indexer.IssueMapping()
 	if err != nil {
+		glog.Errorf("Failed loading issue mapping: %v", err)
 		return err
 	}
+
 	err = w.Indexer.Ensure(indexer.IssueIndex, mapping)
 	if err != nil {
+		glog.Errorf("Failed ensuring index exists: %v", err)
 		return err
 	}
+
 	return w.processCursor(nil)
 }
 
@@ -46,12 +50,15 @@ func (w *IssueWorker) processCursor(endCursor *string) error {
 	glog.Infof("Processing cursor: %v", endCursor)
 	graphIssues, err := w.Graph.FetchIssues(endCursor)
 	if err != nil {
+		glog.Errorf("Failed fetching issues: %v", err)
 		return err
 	}
+
 	for _, edge := range graphIssues.Data.Search.Edges {
 		if len(edge.Node.ID) == 0 {
 			continue
 		}
+
 		doc := w.parseIssue(edge.Node)
 		err = w.Indexer.Index(
 			indexer.IssueIndex,
@@ -60,12 +67,15 @@ func (w *IssueWorker) processCursor(endCursor *string) error {
 			doc,
 		)
 		if err != nil {
+			glog.Errorf("Failed indexing issue: %v", err)
 			return err
 		}
 	}
+
 	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
 		return w.processCursor(&graphIssues.Data.Search.PageInfo.EndCursor)
 	}
+
 	return nil
 }
 
