@@ -72,7 +72,7 @@ func (i *Indexer) Delete(index string) error {
 		return err
 	}
 	if !res.Acknowledged {
-		return fmt.Errorf("Index removal was not acknowledged: %v", res)
+		return fmt.Errorf("Index deletion was not acknowledged: %v", res)
 	}
 	return nil
 }
