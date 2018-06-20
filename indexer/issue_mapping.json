@@ -42,23 +42,11 @@
         "heart": {
           "type": "integer"
         },
-        "authorId": {
-          "type": "keyword"
-        },
-        "authorUrl": {
-          "type": "text"
-        },
         "authorLogin": {
           "type": "keyword"
         },
-        "authorAvatar": {
-          "type": "text"
-        },
-        "repoId": {
+        "repoOwnerLogin": {
           "type": "keyword"
-        },
-        "repoUrl": {
-          "type": "text"
         },
         "repoName": {
           "type": "keyword"
@@ -71,18 +59,6 @@
         },
         "repoStargazers": {
           "type": "integer"
-        },
-        "repoOwnerId": {
-          "type": "keyword"
-        },
-        "repoOwnerUrl": {
-          "type": "text"
-        },
-        "repoOwnerLogin": {
-          "type": "keyword"
-        },
-        "repoOwnerAvatar": {
-          "type": "text"
         },
         "createdAt": {
           "type": "date"
