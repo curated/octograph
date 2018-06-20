@@ -1,5 +1,5 @@
 query Issues($query: String!, $after: String) {
-  search(type: ISSUE, query: $query, first: 10, after: $after) {
+  search(type: ISSUE, query: $query, first: 100, after: $after) {
     issueCount
     pageInfo {
       ...pageInfo
@@ -57,31 +57,24 @@ fragment actor on Actor {
   }
 }
 
+fragment actorProps on Actor {
+  login
+}
+
 fragment user on User {
-  id
   ...actorProps
 }
 
 fragment organization on Organization {
-  id
   ...actorProps
 }
 
 fragment bot on Bot {
-  id
   ...actorProps
 }
 
-fragment actorProps on Actor {
-  url
-  login
-  avatarUrl
-}
-
 fragment repository on Repository {
-  id
   url
-  name
   primaryLanguage {
     name
   }
@@ -90,8 +83,5 @@ fragment repository on Repository {
   }
   stargazers {
     totalCount
-  }
-  owner {
-    ...user
   }
 }

@@ -10,7 +10,7 @@ import (
 )
 
 const root = "./"
-const query = "reactions:>=100"
+const query = "reactions:>=25"
 
 func main() {
 	flag.Parse()

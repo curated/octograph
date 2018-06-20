@@ -56,10 +56,12 @@ type Issue struct {
 
 	ReactionGroups []ReactionGroup
 
+	Author struct {
+		Login string
+	}
+
 	Repository struct {
-		ID   string
-		URL  string
-		Name string
+		URL string
 
 		PrimaryLanguage struct {
 			Name string
@@ -72,20 +74,6 @@ type Issue struct {
 		Stargazers struct {
 			TotalCount int
 		}
-
-		Owner struct {
-			ID        string
-			URL       string
-			Login     string
-			AvatarURL string
-		}
-	}
-
-	Author struct {
-		ID        string
-		URL       string
-		Login     string
-		AvatarURL string
 	}
 }
 

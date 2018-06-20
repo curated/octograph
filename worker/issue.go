@@ -1,6 +1,8 @@
 package worker
 
 import (
+	"strings"
+
 	"github.com/curated/octograph/config"
 	"github.com/curated/octograph/graph"
 	"github.com/curated/octograph/indexer"
@@ -92,35 +94,44 @@ func (w *IssueWorker) getReaction(key string, groups []graph.ReactionGroup) int 
 	return 0
 }
 
+func (w *IssueWorker) getRepoOwnerLogin(repoURL string) string {
+	s := strings.Index(repoURL, "m/")
+	e := strings.LastIndex(repoURL, "/")
+	if s == -1 || e == -1 {
+		return ""
+	}
+	return repoURL[s+2 : e]
+}
+
+func (w *IssueWorker) getRepoName(repoURL string) string {
+	s := strings.LastIndex(repoURL, "/")
+	if s == -1 {
+		return ""
+	}
+	return repoURL[s+1:]
+}
+
 func (w *IssueWorker) parseIssue(node graph.Issue) *indexer.Issue {
 	return &indexer.Issue{
-		ID:              node.ID,
-		URL:             node.URL,
-		Number:          node.Number,
-		Title:           node.Title,
-		BodyText:        node.BodyText,
-		State:           node.State,
-		ThumbsUp:        w.getReaction(reactionThumbsUp, node.ReactionGroups),
-		ThumbsDown:      w.getReaction(reactionThumbsDown, node.ReactionGroups),
-		Laugh:           w.getReaction(reactionLaugh, node.ReactionGroups),
-		Hooray:          w.getReaction(reactionHooray, node.ReactionGroups),
-		Confused:        w.getReaction(reactionConfused, node.ReactionGroups),
-		Heart:           w.getReaction(reactionHeart, node.ReactionGroups),
-		AuthorID:        node.Author.ID,
-		AuthorURL:       node.Author.URL,
-		AuthorLogin:     node.Author.Login,
-		AuthorAvatar:    node.Author.AvatarURL,
-		RepoID:          node.Repository.ID,
-		RepoURL:         node.Repository.URL,
-		RepoName:        node.Repository.Name,
-		RepoLanguage:    node.Repository.PrimaryLanguage.Name,
-		RepoForks:       node.Repository.Forks.TotalCount,
-		RepoStargazers:  node.Repository.Stargazers.TotalCount,
-		RepoOwnerID:     node.Repository.Owner.ID,
-		RepoOwnerURL:    node.Repository.Owner.URL,
-		RepoOwnerLogin:  node.Repository.Owner.Login,
-		RepoOwnerAvatar: node.Repository.Owner.AvatarURL,
-		CreatedAt:       node.CreatedAt,
-		UpdatedAt:       node.UpdatedAt,
+		ID:             node.ID,
+		URL:            node.URL,
+		Number:         node.Number,
+		Title:          node.Title,
+		BodyText:       node.BodyText,
+		State:          node.State,
+		ThumbsUp:       w.getReaction(reactionThumbsUp, node.ReactionGroups),
+		ThumbsDown:     w.getReaction(reactionThumbsDown, node.ReactionGroups),
+		Laugh:          w.getReaction(reactionLaugh, node.ReactionGroups),
+		Hooray:         w.getReaction(reactionHooray, node.ReactionGroups),
+		Confused:       w.getReaction(reactionConfused, node.ReactionGroups),
+		Heart:          w.getReaction(reactionHeart, node.ReactionGroups),
+		AuthorLogin:    node.Author.Login,
+		RepoOwnerLogin: w.getRepoOwnerLogin(node.Repository.URL),
+		RepoName:       w.getRepoName(node.Repository.URL),
+		RepoLanguage:   node.Repository.PrimaryLanguage.Name,
+		RepoForks:      node.Repository.Forks.TotalCount,
+		RepoStargazers: node.Repository.Stargazers.TotalCount,
+		CreatedAt:      node.CreatedAt,
+		UpdatedAt:      node.UpdatedAt,
 	}
 }
