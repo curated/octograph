@@ -10,6 +10,9 @@ import (
 )
 
 const (
+	issueIndex = "issue"
+	issueType  = "issue"
+
 	reactionThumbsUp   = "THUMBS_UP"
 	reactionThumbsDown = "THUMBS_DOWN"
 	reactionLaugh      = "LAUGH"
@@ -34,14 +37,14 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 
 // Process GraphQL nodes into Elastic documents
 func (w *IssueWorker) Process(query string) error {
-	mapping, err := w.Indexer.IssueMapping()
+	mapping, err := w.Indexer.GetMapping("issue.json")
 
 	if err != nil {
 		glog.Errorf("Failed loading issue mapping: %v", err)
 		return err
 	}
 
-	err = w.Indexer.Ensure(indexer.IssueIndex, mapping)
+	err = w.Indexer.Ensure(issueIndex, mapping)
 	if err != nil {
 		glog.Errorf("Failed ensuring index exists: %v", err)
 		return err
@@ -66,8 +69,8 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 
 		doc := w.parseIssue(edge.Node)
 		err = w.Indexer.Index(
-			indexer.IssueIndex,
-			indexer.IssueType,
+			issueIndex,
+			issueType,
 			doc.ID,
 			doc,
 		)
