@@ -12,12 +12,6 @@ import (
 )
 
 const (
-	// IssueIndex in Elastic
-	IssueIndex = "issue"
-
-	// IssueType in Elastic
-	IssueType = "issue"
-
 	elasticScheme   = "https"
 	elasticSniffing = false
 )
@@ -138,13 +132,13 @@ func (i *Indexer) Index(name, typ, id string, body interface{}) error {
 	return nil
 }
 
-// IssueMapping in Elastic
-func (i *Indexer) IssueMapping() (string, error) {
-	mappingJSON := i.Config.GetPath("indexer/issue_mapping.json")
-	b, err := ioutil.ReadFile(mappingJSON)
+// GetMapping for index
+func (i *Indexer) GetMapping(filename string) (string, error) {
+	f := i.Config.GetPath(fmt.Sprintf("mapping/%s", filename))
+	b, err := ioutil.ReadFile(f)
 
 	if err != nil {
-		glog.Errorf("Failed reading '%s' with error: %v", mappingJSON, err)
+		glog.Errorf("Failed reading '%s' with error: %v", f, err)
 		return "", err
 	}
 

@@ -93,13 +93,13 @@ func TestIndex(t *testing.T) {
 	assert.Equal(t, int64(1), sr.TotalHits())
 }
 
-func TestIssueMapping(t *testing.T) {
-	issueMapping, err := idx.IssueMapping()
+func TestGetMapping(t *testing.T) {
+	s, err := idx.GetMapping("issue.json")
 	assert.Nil(t, err)
 
-	var jsonMapping map[string]interface{}
-	err = json.Unmarshal([]byte(issueMapping), &jsonMapping)
+	var m map[string]interface{}
+	err = json.Unmarshal([]byte(s), &m)
 	assert.Nil(t, err)
 
-	assert.True(t, len(issueMapping) > 0)
+	assert.True(t, len(s) > 0)
 }
