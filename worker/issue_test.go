@@ -14,7 +14,7 @@ import (
 var c = config.New("../")
 var issueWorker = worker.NewIssueWorker(c)
 var idx = indexer.New(c)
-var index = "issue"
+var index = "test"
 
 func TestMain(m *testing.M) {
 	exists, err := idx.Client.IndexExists(index).Do(idx.Context)
