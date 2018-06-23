@@ -15,7 +15,6 @@ const (
 	processUsage  = "Processing method: [index|delete] defaults to index"
 	indexProcess  = "index"
 	deleteProcess = "delete"
-	query         = "reactions:>=25"
 )
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 
 	switch *process {
 	case indexProcess:
-		err = issueWorker.Index(query)
+		err = issueWorker.Index()
 	case deleteProcess:
 		err = issueWorker.Delete()
 	}

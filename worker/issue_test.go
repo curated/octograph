@@ -14,7 +14,7 @@ import (
 var c = config.New("../")
 var issueWorker = worker.NewIssueWorker(c)
 var idx = indexer.New(c)
-var index = "issue"
+var index = "issuedev"
 
 func TestMain(m *testing.M) {
 	exists, err := idx.Client.IndexExists(index).Do(idx.Context)
@@ -37,9 +37,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestProcess(t *testing.T) {
-	query := "reactions:>3000"
-
+func TestIndex(t *testing.T) {
 	sr, err := idx.Client.Search().
 		Index(index).
 		From(0).
@@ -49,7 +47,7 @@ func TestProcess(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int64(0), sr.TotalHits())
 
-	issueWorker.Process(query)
+	issueWorker.Index()
 	assert.Nil(t, err)
 
 	_, err = idx.Client.Flush(index).Do(idx.Context)

@@ -11,7 +11,7 @@ import (
 
 const (
 	configKey   = "CONFIG"
-	defaultFile = "config/config.prod.json"
+	defaultFile = "config/dev.config.json"
 )
 
 // Config values
@@ -26,6 +26,10 @@ type Config struct {
 
 	GitHub struct {
 		Token string
+	}
+
+	IssueWorker struct {
+		Query string
 	}
 }
 

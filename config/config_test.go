@@ -9,21 +9,25 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	os.Setenv("CONFIG", "config/config.test.json")
 	c := config.New("../")
 
 	assert.NotEmpty(t, c.Elastic.URL)
 	assert.NotEmpty(t, c.Elastic.Username)
 	assert.NotEmpty(t, c.Elastic.Password)
 	assert.NotEmpty(t, c.GitHub.Token)
+	assert.Equal(t, "reactions:>=3000", c.IssueWorker.Query)
 }
 
-func TestConfigOverride(t *testing.T) {
-	os.Setenv("CONFIG", "config/config.json")
+func TestOverride(t *testing.T) {
+	orig := os.Getenv("CONFIG")
+	os.Setenv("CONFIG", "config/config.sample.json")
 	c := config.New("../")
 
 	assert.Empty(t, c.Elastic.URL)
 	assert.Empty(t, c.Elastic.Username)
 	assert.Empty(t, c.Elastic.Password)
 	assert.Empty(t, c.GitHub.Token)
+	assert.Equal(t, "reactions:>=100", c.IssueWorker.Query)
+
+	os.Setenv("CONFIG", orig)
 }

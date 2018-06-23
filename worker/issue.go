@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	issueIndex = "issue"
-	issueType  = "issue"
+	issueIndex = "issuedev"
+	issueType  = "issuedev"
 
 	reactionThumbsUp   = "THUMBS_UP"
 	reactionThumbsDown = "THUMBS_DOWN"
@@ -28,6 +28,7 @@ const (
 type IssueWorker struct {
 	Graph   *graph.Graph
 	Indexer *indexer.Indexer
+	Config  *config.Config
 }
 
 // NewIssueWorker creates a new issue worker
@@ -35,11 +36,12 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 	return &IssueWorker{
 		Graph:   graph.New(c),
 		Indexer: indexer.New(c),
+		Config:  c,
 	}
 }
 
 // Index GraphQL nodes into Elastic documents
-func (w *IssueWorker) Index(query string) error {
+func (w *IssueWorker) Index() error {
 	mapping, err := w.Indexer.GetMapping("issue.json")
 
 	if err != nil {
@@ -53,7 +55,7 @@ func (w *IssueWorker) Index(query string) error {
 		return err
 	}
 
-	return w.processCursor(query, nil)
+	return w.processCursor(w.Config.IssueWorker.Query, nil)
 }
 
 // Delete index from Elastic cluster

@@ -6,7 +6,7 @@ dev:
 	docker-compose up
 
 test:
-	@CONFIG=config/config.test.json go test ./...
+	@CONFIG=config/test.config.json go test ./...
 
 index:
 	@go run main.go -logtostderr=true

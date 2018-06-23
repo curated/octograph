@@ -6,5 +6,8 @@
   },
   "GitHub": {
     "Token": ""
+  },
+  "IssueWorker": {
+    "Query": "reactions:>=100"
   }
 }
