@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/curated/octograph/config"
+	"github.com/curated/octograph/gql"
 	"github.com/curated/octograph/graph"
 	"github.com/curated/octograph/indexer"
 	"github.com/curated/octograph/mapping"
@@ -104,7 +105,7 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 	return nil
 }
 
-func (w *IssueWorker) getReaction(key string, groups []graph.ReactionGroup) int {
+func (w *IssueWorker) getReaction(key string, groups []gql.ReactionGroup) int {
 	for _, g := range groups {
 		if key == g.Content {
 			return g.Users.TotalCount
@@ -137,7 +138,7 @@ func (w *IssueWorker) getValue(s string) string {
 	return s
 }
 
-func (w *IssueWorker) parseIssue(node graph.Issue) *mapping.Issue {
+func (w *IssueWorker) parseIssue(node gql.Issue) *mapping.Issue {
 	authorLogin := w.getValue(node.Author.Login)
 	repoOwnerLogin := w.getRepoOwnerLogin(node.Repository.URL)
 	repoName := w.getRepoName(node.Repository.URL)

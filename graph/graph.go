@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/curated/octograph/config"
+	"github.com/curated/octograph/gql"
 	"github.com/golang/glog"
 )
 
@@ -24,66 +24,6 @@ type Graph struct {
 type ReqBody struct {
 	Query     string                 `json:"query"`
 	Variables map[string]interface{} `json:"variables"`
-}
-
-// Issues response structure from GraphQL
-type Issues struct {
-	Data struct {
-		Search struct {
-			IssueCount int
-
-			PageInfo struct {
-				EndCursor string
-			}
-
-			Edges []struct {
-				Node Issue
-			}
-		}
-	}
-}
-
-// Issue node structure from GraphQL
-type Issue struct {
-	ID        string
-	URL       string
-	Number    int
-	Title     string
-	BodyText  string
-	State     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-
-	ReactionGroups []ReactionGroup
-
-	Author struct {
-		Login string
-	}
-
-	Repository struct {
-		URL string
-
-		PrimaryLanguage struct {
-			Name string
-		}
-
-		Forks struct {
-			TotalCount int
-		}
-
-		Stargazers struct {
-			TotalCount int
-		}
-	}
-}
-
-// ReactionGroup node structure from GraphQL
-type ReactionGroup struct {
-	Content string
-
-	Users struct {
-		TotalCount int
-	}
 }
 
 // New creates a new graph client
@@ -142,8 +82,8 @@ func (g *Graph) Fetch(query []byte, variables map[string]interface{}) ([]byte, e
 }
 
 // FetchIssues by query, after optional end cursor
-func (g *Graph) FetchIssues(query string, endCursor *string) (*Issues, error) {
-	issuesGQL := g.Config.GetPath("graph/issues_query.gql")
+func (g *Graph) FetchIssues(query string, endCursor *string) (*gql.Issues, error) {
+	issuesGQL := g.Config.GetPath("gql/issues.gql")
 	b, err := ioutil.ReadFile(issuesGQL)
 
 	if err != nil {
@@ -161,7 +101,7 @@ func (g *Graph) FetchIssues(query string, endCursor *string) (*Issues, error) {
 		return nil, err
 	}
 
-	var issues Issues
+	var issues gql.Issues
 	err = json.Unmarshal(res, &issues)
 
 	if err != nil {

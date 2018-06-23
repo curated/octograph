@@ -12,7 +12,7 @@ FROM alpine
 # ENV CONFIG=config/prod.config.json
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /octograph/config/dev.config.json config/
-COPY --from=build /octograph/graph/issues_query.gql graph/
+COPY --from=build /octograph/gql/issues.gql gql/
 COPY --from=build /octograph/mapping/issue.json mapping/
 COPY --from=build /app ./
 CMD ["/app", "-logtostderr=true"]
