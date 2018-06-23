@@ -45,8 +45,8 @@ func TestCreate(t *testing.T) {
 
 func TestEnsure(t *testing.T) {
 	res, err := idx.Client.DeleteIndex(c.Issue.Index).Do(idx.Context)
-	assert.True(t, res.Acknowledged)
 	assert.Nil(t, err)
+	assert.True(t, res.Acknowledged)
 
 	for i := 1; i <= 2; i++ {
 		err = idx.Ensure(c.Issue.Index, "{}")
@@ -69,8 +69,8 @@ func TestDelete(t *testing.T) {
 
 func TestIndex(t *testing.T) {
 	res, err := idx.Client.CreateIndex(c.Issue.Index).Do(idx.Context)
-	assert.True(t, res.Acknowledged)
 	assert.Nil(t, err)
+	assert.True(t, res.Acknowledged)
 
 	sr, err := idx.Client.Search().
 		Index(c.Issue.Index).
@@ -104,6 +104,5 @@ func TestGetMapping(t *testing.T) {
 	var m map[string]interface{}
 	err = json.Unmarshal([]byte(s), &m)
 	assert.Nil(t, err)
-
 	assert.True(t, len(s) > 0)
 }
