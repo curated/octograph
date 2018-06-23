@@ -1,6 +1,6 @@
 default: test
 
-.PHONY: dev test index delete
+.PHONY: dev test index delete deploy
 
 dev:
 	docker-compose up
@@ -13,3 +13,9 @@ index:
 
 delete:
 	@go run main.go -logtostderr=true -process=delete
+
+push:
+	@heroku container:push worker --app=octograph
+
+release:
+	@heroku container:release worker --app=octograph
