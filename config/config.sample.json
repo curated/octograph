@@ -1,4 +1,5 @@
 {
+  "Env": "sample",
   "Elastic": {
     "URL": "",
     "Username": "",

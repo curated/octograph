@@ -24,11 +24,15 @@ func main() {
 	process := flag.String(processFlag, indexProcess, processUsage)
 	flag.Parse()
 
+	glog.Infof("Processing %s in %s", *process, c.Env)
+
 	switch *process {
 	case indexProcess:
 		err = issueWorker.Index()
 	case deleteProcess:
 		err = issueWorker.Delete()
+	default:
+		glog.Fatalf("Invalid process argument: %s", *process)
 	}
 
 	if err != nil {

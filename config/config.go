@@ -16,6 +16,7 @@ const (
 
 // Config values
 type Config struct {
+	Env  string
 	Root string
 
 	Elastic struct {
