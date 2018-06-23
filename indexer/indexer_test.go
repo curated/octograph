@@ -16,6 +16,8 @@ var idx = indexer.New(c)
 var issueType = "issue"
 
 func TestMain(m *testing.M) {
+	c.Issue.Index = "indexer_test"
+
 	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 	if err != nil {
 		panic(err)

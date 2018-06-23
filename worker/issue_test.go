@@ -16,6 +16,8 @@ var issueWorker = worker.NewIssueWorker(c)
 var idx = indexer.New(c)
 
 func TestMain(m *testing.M) {
+	c.Issue.Index = "issue_worker_test"
+
 	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 	if err != nil {
 		panic(err)
