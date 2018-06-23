@@ -36,8 +36,8 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 	}
 }
 
-// Process GraphQL nodes into Elastic documents
-func (w *IssueWorker) Process(query string) error {
+// Index GraphQL nodes into Elastic documents
+func (w *IssueWorker) Index(query string) error {
 	mapping, err := w.Indexer.GetMapping("issue.json")
 
 	if err != nil {
@@ -52,6 +52,17 @@ func (w *IssueWorker) Process(query string) error {
 	}
 
 	return w.processCursor(query, nil)
+}
+
+// Delete index from Elastic cluster
+func (w *IssueWorker) Delete() error {
+	err := w.Indexer.Delete(issueIndex)
+	if err != nil {
+		glog.Errorf("Failed deleting index: %v", err)
+		return err
+	}
+
+	return nil
 }
 
 func (w *IssueWorker) processCursor(query string, endCursor *string) error {

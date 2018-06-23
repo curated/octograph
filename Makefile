@@ -1,6 +1,6 @@
 default: test
 
-.PHONY: test run
+.PHONY: dev test index delete
 
 dev:
 	docker-compose up
@@ -8,5 +8,8 @@ dev:
 test:
 	@CONFIG=config/config.test.json go test ./...
 
-run:
+index:
 	@go run main.go -logtostderr=true
+
+delete:
+	@go run main.go -logtostderr=true -process=delete
