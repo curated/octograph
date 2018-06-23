@@ -2,6 +2,7 @@ package worker
 
 import (
 	"strings"
+	"time"
 
 	"github.com/curated/octograph/config"
 	"github.com/curated/octograph/gql"
@@ -26,17 +27,19 @@ const (
 
 // IssueWorker struct
 type IssueWorker struct {
-	Graph   *graph.Graph
-	Indexer *indexer.Indexer
-	Config  *config.Config
+	QueryRing *QueryRing
+	Graph     *graph.Graph
+	Indexer   *indexer.Indexer
+	Config    *config.Config
 }
 
 // NewIssueWorker creates a new issue worker
 func NewIssueWorker(c *config.Config) *IssueWorker {
 	return &IssueWorker{
-		Graph:   graph.New(c),
-		Indexer: indexer.New(c),
-		Config:  c,
+		QueryRing: NewQueryRing(c.Issue.QueryRing),
+		Graph:     graph.New(c),
+		Indexer:   indexer.New(c),
+		Config:    c,
 	}
 }
 
@@ -55,7 +58,7 @@ func (w *IssueWorker) Index() error {
 		return err
 	}
 
-	return w.processCursor(w.Config.Issue.Query, nil)
+	return w.processCursor(w.QueryRing.Next(), nil)
 }
 
 // Delete index from Elastic cluster
@@ -70,19 +73,21 @@ func (w *IssueWorker) Delete() error {
 }
 
 func (w *IssueWorker) processCursor(query string, endCursor *string) error {
+	if endCursor == nil {
+		glog.Infof("Query: %s", query)
+	}
+
 	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
 	if err != nil {
 		glog.Errorf("Failed fetching issues: %v", err)
 		return err
 	}
 
-	var count int
 	for _, edge := range graphIssues.Data.Search.Edges {
 		if len(edge.Node.ID) == 0 {
 			continue
 		}
 
-		count++
 		doc := w.parseIssue(edge.Node)
 		err = w.Indexer.Index(
 			w.Config.Issue.Index,
@@ -97,9 +102,13 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 		}
 	}
 
-	glog.Errorf("Indexed %d/%d documents", count, len(graphIssues.Data.Search.Edges))
 	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
 		return w.processCursor(query, &graphIssues.Data.Search.PageInfo.EndCursor)
+	}
+
+	if w.Config.Issue.Interval >= 0 {
+		time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
+		return w.processCursor(w.QueryRing.Next(), nil)
 	}
 
 	return nil

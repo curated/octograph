@@ -9,7 +9,8 @@
     "Token": ""
   },
   "Issue": {
-    "Query": "reactions:>=100",
+    "Interval": 60,
+    "QueryRing": ["reactions:>=100"],
     "Index": "issue"
   }
 }

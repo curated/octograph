@@ -24,7 +24,7 @@ func main() {
 	process := flag.String(processFlag, indexProcess, processUsage)
 	flag.Parse()
 
-	glog.Infof("Processing %s in %s", *process, c.Env)
+	glog.Infof("Running %s on %s", *process, c.Env)
 
 	switch *process {
 	case indexProcess:

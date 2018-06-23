@@ -30,8 +30,9 @@ type Config struct {
 	}
 
 	Issue struct {
-		Query string
-		Index string
+		Interval  int
+		QueryRing []string
+		Index     string
 	}
 }
 
