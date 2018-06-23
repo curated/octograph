@@ -20,6 +20,8 @@ const (
 	reactionHooray     = "HOORAY"
 	reactionConfused   = "CONFUSED"
 	reactionHeart      = "HEART"
+
+	missingValue = "?"
 )
 
 // IssueWorker struct
@@ -113,7 +115,7 @@ func (w *IssueWorker) getRepoOwnerLogin(repoURL string) string {
 	s := strings.Index(repoURL, "m/")
 	e := strings.LastIndex(repoURL, "/")
 	if s == -1 || e == -1 {
-		return ""
+		return missingValue
 	}
 	return repoURL[s+2 : e]
 }
@@ -121,14 +123,23 @@ func (w *IssueWorker) getRepoOwnerLogin(repoURL string) string {
 func (w *IssueWorker) getRepoName(repoURL string) string {
 	s := strings.LastIndex(repoURL, "/")
 	if s == -1 {
-		return ""
+		return missingValue
 	}
 	return repoURL[s+1:]
 }
 
+func (w *IssueWorker) getValue(s string) string {
+	if len(s) == 0 {
+		return missingValue
+	}
+	return s
+}
+
 func (w *IssueWorker) parseIssue(node graph.Issue) *mapping.Issue {
+	authorLogin := w.getValue(node.Author.Login)
 	repoOwnerLogin := w.getRepoOwnerLogin(node.Repository.URL)
 	repoName := w.getRepoName(node.Repository.URL)
+	repoLanguage := w.getValue(node.Repository.PrimaryLanguage.Name)
 
 	return &mapping.Issue{
 		ID:                    node.ID,
@@ -143,14 +154,14 @@ func (w *IssueWorker) parseIssue(node graph.Issue) *mapping.Issue {
 		Hooray:                w.getReaction(reactionHooray, node.ReactionGroups),
 		Confused:              w.getReaction(reactionConfused, node.ReactionGroups),
 		Heart:                 w.getReaction(reactionHeart, node.ReactionGroups),
-		AuthorLogin:           node.Author.Login,
-		AuthorLoginSuggest:    node.Author.Login,
+		AuthorLogin:           authorLogin,
+		AuthorLoginSuggest:    authorLogin,
 		RepoOwnerLogin:        repoOwnerLogin,
 		RepoOwnerLoginSuggest: repoOwnerLogin,
 		RepoName:              repoName,
 		RepoNameSuggest:       repoName,
-		RepoLanguage:          node.Repository.PrimaryLanguage.Name,
-		RepoLanguageSuggest:   node.Repository.PrimaryLanguage.Name,
+		RepoLanguage:          repoLanguage,
+		RepoLanguageSuggest:   repoLanguage,
 		RepoForks:             node.Repository.Forks.TotalCount,
 		RepoStargazers:        node.Repository.Stargazers.TotalCount,
 		CreatedAt:             node.CreatedAt,
