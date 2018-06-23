@@ -69,19 +69,19 @@ func (w *IssueWorker) Delete() error {
 }
 
 func (w *IssueWorker) processCursor(query string, endCursor *string) error {
-	glog.Infof("Processing cursor: %v", endCursor)
-
 	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
 	if err != nil {
 		glog.Errorf("Failed fetching issues: %v", err)
 		return err
 	}
 
+	var count int
 	for _, edge := range graphIssues.Data.Search.Edges {
 		if len(edge.Node.ID) == 0 {
 			continue
 		}
 
+		count++
 		doc := w.parseIssue(edge.Node)
 		err = w.Indexer.Index(
 			w.Config.Issue.Index,
@@ -96,6 +96,7 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 		}
 	}
 
+	glog.Errorf("Indexed %d/%d documents", count, len(graphIssues.Data.Search.Edges))
 	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
 		return w.processCursor(query, &graphIssues.Data.Search.PageInfo.EndCursor)
 	}
