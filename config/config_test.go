@@ -17,7 +17,8 @@ func TestConfig(t *testing.T) {
 	assert.NotEmpty(t, c.Elastic.Username)
 	assert.NotEmpty(t, c.Elastic.Password)
 	assert.NotEmpty(t, c.GitHub.Token)
-	assert.Equal(t, "reactions:>=3000", c.IssueWorker.Query)
+	assert.Equal(t, "reactions:>=3000", c.Issue.Query)
+	assert.Equal(t, "issue", c.Issue.Index)
 }
 
 func TestOverride(t *testing.T) {
@@ -31,7 +32,8 @@ func TestOverride(t *testing.T) {
 	assert.Empty(t, c.Elastic.Username)
 	assert.Empty(t, c.Elastic.Password)
 	assert.Empty(t, c.GitHub.Token)
-	assert.Equal(t, "reactions:>=100", c.IssueWorker.Query)
+	assert.Equal(t, "reactions:>=100", c.Issue.Query)
+	assert.Equal(t, "issue", c.Issue.Index)
 
 	os.Setenv("CONFIG", orig)
 }

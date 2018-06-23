@@ -11,19 +11,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var idx = indexer.New(config.New("../"))
-var index = "test"
+var c = config.New("../")
+var idx = indexer.New(c)
+var issueType = "issue"
 
 func TestMain(m *testing.M) {
-	exists, err := idx.Client.IndexExists(index).Do(idx.Context)
+	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 	if err != nil {
 		panic(err)
 	}
 
 	if exists {
-		res, err := idx.Client.DeleteIndex(index).Do(idx.Context)
+		res, err := idx.Client.DeleteIndex(c.Issue.Index).Do(idx.Context)
 		if err != nil {
-			panic(fmt.Sprintf("Delete acknowledged: %v, error: %v", res.Acknowledged, err))
+			panic(err)
+		}
+		if !res.Acknowledged {
+			panic(fmt.Sprintf("Index deletion was not acknowledged: %+v", res))
 		}
 	}
 
@@ -31,45 +35,45 @@ func TestMain(m *testing.M) {
 }
 
 func TestCreate(t *testing.T) {
-	err := idx.Create(index, "{}")
+	err := idx.Create(c.Issue.Index, "{}")
 	assert.Nil(t, err)
 
-	exists, err := idx.Client.IndexExists(index).Do(idx.Context)
+	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 	assert.Nil(t, err)
 	assert.True(t, exists)
 }
 
 func TestEnsure(t *testing.T) {
-	res, err := idx.Client.DeleteIndex(index).Do(idx.Context)
+	res, err := idx.Client.DeleteIndex(c.Issue.Index).Do(idx.Context)
 	assert.True(t, res.Acknowledged)
 	assert.Nil(t, err)
 
 	for i := 1; i <= 2; i++ {
-		err = idx.Ensure(index, "{}")
+		err = idx.Ensure(c.Issue.Index, "{}")
 		assert.Nil(t, err)
 
-		exists, err := idx.Client.IndexExists(index).Do(idx.Context)
+		exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 		assert.Nil(t, err)
 		assert.True(t, exists)
 	}
 }
 
 func TestDelete(t *testing.T) {
-	err := idx.Delete(index)
+	err := idx.Delete(c.Issue.Index)
 	assert.Nil(t, err)
 
-	exists, err := idx.Client.IndexExists(index).Do(idx.Context)
+	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 	assert.Nil(t, err)
 	assert.False(t, exists)
 }
 
 func TestIndex(t *testing.T) {
-	res, err := idx.Client.CreateIndex(index).Do(idx.Context)
+	res, err := idx.Client.CreateIndex(c.Issue.Index).Do(idx.Context)
 	assert.True(t, res.Acknowledged)
 	assert.Nil(t, err)
 
 	sr, err := idx.Client.Search().
-		Index(index).
+		Index(c.Issue.Index).
 		From(0).
 		Size(10).
 		Do(idx.Context)
@@ -77,14 +81,14 @@ func TestIndex(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int64(0), sr.TotalHits())
 
-	err = idx.Index(index, index, "id", "{}")
+	err = idx.Index(c.Issue.Index, issueType, "id", "{}")
 	assert.Nil(t, err)
 
-	_, err = idx.Client.Flush(index).Do(idx.Context)
+	_, err = idx.Client.Flush(c.Issue.Index).Do(idx.Context)
 	assert.Nil(t, err)
 
 	sr, err = idx.Client.Search().
-		Index(index).
+		Index(c.Issue.Index).
 		From(0).
 		Size(10).
 		Do(idx.Context)

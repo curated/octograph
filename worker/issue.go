@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	issueIndex = "issuedev"
-	issueType  = "issuedev"
+	issueType = "issue"
 
 	reactionThumbsUp   = "THUMBS_UP"
 	reactionThumbsDown = "THUMBS_DOWN"
@@ -49,18 +48,18 @@ func (w *IssueWorker) Index() error {
 		return err
 	}
 
-	err = w.Indexer.Ensure(issueIndex, mapping)
+	err = w.Indexer.Ensure(w.Config.Issue.Index, mapping)
 	if err != nil {
 		glog.Errorf("Failed ensuring index exists: %v", err)
 		return err
 	}
 
-	return w.processCursor(w.Config.IssueWorker.Query, nil)
+	return w.processCursor(w.Config.Issue.Query, nil)
 }
 
 // Delete index from Elastic cluster
 func (w *IssueWorker) Delete() error {
-	err := w.Indexer.Delete(issueIndex)
+	err := w.Indexer.Delete(w.Config.Issue.Index)
 	if err != nil {
 		glog.Errorf("Failed deleting index: %v", err)
 		return err
@@ -85,7 +84,7 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 
 		doc := w.parseIssue(edge.Node)
 		err = w.Indexer.Index(
-			issueIndex,
+			w.Config.Issue.Index,
 			issueType,
 			doc.ID,
 			doc,

@@ -29,8 +29,9 @@ type Config struct {
 		Token string
 	}
 
-	IssueWorker struct {
+	Issue struct {
 		Query string
+		Index string
 	}
 }
 

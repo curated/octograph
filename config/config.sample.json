@@ -8,7 +8,8 @@
   "GitHub": {
     "Token": ""
   },
-  "IssueWorker": {
-    "Query": "reactions:>=100"
+  "Issue": {
+    "Query": "reactions:>=100",
+    "Index": "issue"
   }
 }

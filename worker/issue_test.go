@@ -14,24 +14,29 @@ import (
 var c = config.New("../")
 var issueWorker = worker.NewIssueWorker(c)
 var idx = indexer.New(c)
-var index = "issuedev"
 
 func TestMain(m *testing.M) {
-	exists, err := idx.Client.IndexExists(index).Do(idx.Context)
+	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
 	if err != nil {
 		panic(err)
 	}
 
 	if exists {
-		res, err := idx.Client.DeleteIndex(index).Do(idx.Context)
-		if err != nil || !res.Acknowledged {
-			panic(fmt.Sprintf("Delete acknowledged: %v, error: %v", res.Acknowledged, err))
+		res, err := idx.Client.DeleteIndex(c.Issue.Index).Do(idx.Context)
+		if err != nil {
+			panic(err)
+		}
+		if !res.Acknowledged {
+			panic(fmt.Sprintf("Index deletion was not acknowledged: %+v", res))
 		}
 	}
 
-	res, err := idx.Client.CreateIndex(index).Do(idx.Context)
+	res, err := idx.Client.CreateIndex(c.Issue.Index).Do(idx.Context)
 	if err != nil {
-		panic(fmt.Sprintf("Create acknowledged: %v, error: %v", res.Acknowledged, err))
+		panic(err)
+	}
+	if !res.Acknowledged {
+		panic(fmt.Sprintf("Index creation was not acknowledged: %+v", res))
 	}
 
 	os.Exit(m.Run())
@@ -39,7 +44,7 @@ func TestMain(m *testing.M) {
 
 func TestIndex(t *testing.T) {
 	sr, err := idx.Client.Search().
-		Index(index).
+		Index(c.Issue.Index).
 		From(0).
 		Size(10).
 		Do(idx.Context)
@@ -50,15 +55,25 @@ func TestIndex(t *testing.T) {
 	issueWorker.Index()
 	assert.Nil(t, err)
 
-	_, err = idx.Client.Flush(index).Do(idx.Context)
+	_, err = idx.Client.Flush(c.Issue.Index).Do(idx.Context)
 	assert.Nil(t, err)
 
 	sr, err = idx.Client.Search().
-		Index(index).
+		Index(c.Issue.Index).
 		From(0).
 		Size(10).
 		Do(idx.Context)
 
 	assert.Nil(t, err)
 	assert.True(t, sr.TotalHits() > 0)
+}
+
+func TestDelete(t *testing.T) {
+	err := issueWorker.Delete()
+	assert.Nil(t, err)
+
+	exists, err := idx.Client.IndexExists(c.Issue.Index).Do(idx.Context)
+
+	assert.Nil(t, err)
+	assert.False(t, exists)
 }
