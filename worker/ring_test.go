@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestQueryRing(t *testing.T) {
+func TestNext(t *testing.T) {
 	r := worker.NewQueryRing([]string{
 		"foo: {date}",
 		"bar",
@@ -23,4 +23,17 @@ func TestQueryRing(t *testing.T) {
 	assert.Equal(t, "bar", r.Next())
 	assert.Equal(t, "zip", r.Next())
 	assert.Equal(t, foo, r.Next())
+}
+
+func TestRollback(t *testing.T) {
+	r := worker.NewQueryRing([]string{
+		"foo",
+		"bar",
+	})
+
+	assert.Equal(t, "foo", r.Next())
+	assert.Equal(t, "bar", r.Next())
+
+	r.Rollback()
+	assert.Equal(t, "bar", r.Next())
 }

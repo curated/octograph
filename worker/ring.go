@@ -37,3 +37,8 @@ func (r *QueryRing) Next() string {
 	date := time.Now().AddDate(0, 0, -1).UTC().Format(isoDateFormat)
 	return strings.Replace(v.(string), dateVar, date, -1)
 }
+
+// Rollback to previous entry
+func (r *QueryRing) Rollback() {
+	r.Ring = r.Ring.Prev()
+}
