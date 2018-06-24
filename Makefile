@@ -1,9 +1,6 @@
 default: test
 
-.PHONY: dev test index delete deploy
-
-dev:
-	docker-compose up
+.PHONY: test index delete push release
 
 test:
 	@CONFIG=config/test.config.json GOCACHE=off go test ./...
