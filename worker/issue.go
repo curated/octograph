@@ -45,9 +45,12 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 
 // RecurseIndex with error intervals
 func (w *IssueWorker) RecurseIndex() error {
+	glog.Infof("Initializing index on %s", w.Config.Env)
 	err := w.Index()
 
 	if err != nil {
+		glog.Info("Rolling back query ring")
+		w.QueryRing.Rollback()
 		w.wait()
 	}
 
@@ -85,13 +88,17 @@ func (w *IssueWorker) Delete() error {
 
 func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 	if endCursor == nil {
-		glog.Infof("Query: %s", query)
+		glog.Infof("Fetching GraphQL query: %s", query)
 	}
 
 	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
 	if err != nil {
 		glog.Errorf("Failed fetching issues: %v", err)
 		return err
+	}
+
+	if endCursor == nil {
+		glog.Infof("Found %d nodes", graphIssues.Data.Search.IssueCount)
 	}
 
 	for _, edge := range graphIssues.Data.Search.Edges {
@@ -126,6 +133,7 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 }
 
 func (w *IssueWorker) wait() {
+	glog.Infof("Waiting %d seconds", w.Config.Issue.Interval)
 	time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
 }
 
