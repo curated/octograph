@@ -135,7 +135,6 @@ func (w *IssueWorker) next() error {
 }
 
 func (w *IssueWorker) wait() {
-	glog.Infof("Waiting %ds", w.Config.Issue.Interval)
 	time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
 }
 
