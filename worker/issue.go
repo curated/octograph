@@ -43,6 +43,17 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 	}
 }
 
+// RecurseIndex with error intervals
+func (w *IssueWorker) RecurseIndex() error {
+	err := w.Index()
+
+	if err != nil {
+		w.wait()
+	}
+
+	return w.RecurseIndex()
+}
+
 // Index GraphQL nodes into Elastic documents
 func (w *IssueWorker) Index() error {
 	mapping, err := w.Indexer.GetMapping("issue.json")
@@ -107,11 +118,15 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 	}
 
 	if w.Config.Issue.Interval >= 0 {
-		time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
+		w.wait()
 		return w.processCursor(w.QueryRing.Next(), nil)
 	}
 
 	return nil
+}
+
+func (w *IssueWorker) wait() {
+	time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
 }
 
 func (w *IssueWorker) getReaction(key string, groups []gql.ReactionGroup) int {

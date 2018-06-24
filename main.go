@@ -28,7 +28,7 @@ func main() {
 
 	switch *process {
 	case indexProcess:
-		err = issueWorker.Index()
+		err = issueWorker.RecurseIndex()
 	case deleteProcess:
 		err = issueWorker.Delete()
 	default:
