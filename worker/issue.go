@@ -45,7 +45,7 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 
 // RecurseIndex with error intervals
 func (w *IssueWorker) RecurseIndex() error {
-	glog.Infof("Initializing index on %s", w.Config.Env)
+	glog.Infof("Indexing %s", w.Config.Env)
 	err := w.Index()
 
 	if err != nil {
@@ -72,7 +72,7 @@ func (w *IssueWorker) Index() error {
 		return err
 	}
 
-	return w.processCursor(w.QueryRing.Next(), nil)
+	return w.processCursor(w.QueryRing.Next(), nil, 0)
 }
 
 // Delete index from Elastic cluster
@@ -86,9 +86,9 @@ func (w *IssueWorker) Delete() error {
 	return nil
 }
 
-func (w *IssueWorker) processCursor(query string, endCursor *string) error {
+func (w *IssueWorker) processCursor(query string, endCursor *string, count int) error {
 	if endCursor == nil {
-		glog.Infof("Fetching GraphQL query: %s", query)
+		glog.Infof("Query: %s", query)
 	}
 
 	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
@@ -118,15 +118,19 @@ func (w *IssueWorker) processCursor(query string, endCursor *string) error {
 			glog.Errorf("Failed indexing issue: %v", err)
 			return err
 		}
+
+		count++
 	}
 
 	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
-		return w.processCursor(query, &graphIssues.Data.Search.PageInfo.EndCursor)
+		return w.processCursor(query, &graphIssues.Data.Search.PageInfo.EndCursor, count)
 	}
+
+	glog.Errorf("Indexed %d documents", count)
 
 	if w.Config.Issue.Interval >= 0 {
 		w.wait()
-		return w.processCursor(w.QueryRing.Next(), nil)
+		return w.processCursor(w.QueryRing.Next(), nil, 0)
 	}
 
 	return nil
