@@ -45,7 +45,6 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 
 // RecurseIndex with error intervals
 func (w *IssueWorker) RecurseIndex() error {
-	glog.Infof("Indexing %s", w.Config.Env)
 	err := w.Index()
 
 	if err != nil {

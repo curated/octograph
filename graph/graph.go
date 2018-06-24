@@ -97,7 +97,7 @@ func (g *Graph) FetchIssues(query string, endCursor *string) (*gql.Issues, error
 	})
 
 	if err != nil {
-		glog.Errorf("Failed fetching issues: '%v', response: %+v", err, res)
+		glog.Errorf("Failed fetching issues: %v", err)
 		return nil, err
 	}
 
