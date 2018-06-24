@@ -71,7 +71,7 @@ func (w *IssueWorker) Index() error {
 		return err
 	}
 
-	return w.processCursor(w.QueryRing.Next(), nil, 0)
+	return w.next()
 }
 
 // Delete index from Elastic cluster
@@ -85,22 +85,15 @@ func (w *IssueWorker) Delete() error {
 	return nil
 }
 
-func (w *IssueWorker) processCursor(query string, endCursor *string, count int) error {
-	if endCursor == nil {
-		glog.Infof("Query: %s", query)
-	}
+func (w *IssueWorker) process(query string, endCursor *string, count int) error {
+	issues, err := w.Graph.FetchIssues(query, endCursor)
 
-	graphIssues, err := w.Graph.FetchIssues(query, endCursor)
 	if err != nil {
 		glog.Errorf("Failed fetching issues: %v", err)
 		return err
 	}
 
-	if endCursor == nil {
-		glog.Infof("Found %d nodes", graphIssues.Data.Search.IssueCount)
-	}
-
-	for _, edge := range graphIssues.Data.Search.Edges {
+	for _, edge := range issues.Data.Search.Edges {
 		if len(edge.Node.ID) == 0 {
 			continue
 		}
@@ -121,22 +114,28 @@ func (w *IssueWorker) processCursor(query string, endCursor *string, count int) 
 		count++
 	}
 
-	if len(graphIssues.Data.Search.PageInfo.EndCursor) > 0 {
-		return w.processCursor(query, &graphIssues.Data.Search.PageInfo.EndCursor, count)
+	if len(issues.Data.Search.PageInfo.EndCursor) > 0 {
+		return w.process(query, &issues.Data.Search.PageInfo.EndCursor, count)
 	}
 
-	glog.Errorf("Indexed %d documents", count)
+	glog.Errorf("Indexed %d/%d", count, issues.Data.Search.IssueCount)
 
 	if w.Config.Issue.Interval >= 0 {
 		w.wait()
-		return w.processCursor(w.QueryRing.Next(), nil, 0)
+		return w.next()
 	}
 
 	return nil
 }
 
+func (w *IssueWorker) next() error {
+	query := w.QueryRing.Next()
+	glog.Infof("Next query: %s", query)
+	return w.process(query, nil, 0)
+}
+
 func (w *IssueWorker) wait() {
-	glog.Infof("Waiting %d seconds", w.Config.Issue.Interval)
+	glog.Infof("Waiting %ds", w.Config.Issue.Interval)
 	time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
 }
 
