@@ -14,6 +14,17 @@
   revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
 
 [[projects]]
+  name = "github.com/google/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value"
+  ]
+  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
+  version = "v0.2.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/mailru/easyjson"
   packages = [
@@ -55,6 +66,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8870f3554334f6915d041252af326dcf3a9a56791fca239fbe758cacf9205c5e"
+  inputs-digest = "afbba36db8ebe29c5a3a1523035152d65893057ebf2d1237974a9f6364d51590"
   solver-name = "gps-cdcl"
   solver-version = 1
