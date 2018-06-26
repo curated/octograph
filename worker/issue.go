@@ -10,22 +10,12 @@ import (
 	"github.com/curated/octograph/graph"
 	"github.com/curated/octograph/indexer"
 	"github.com/curated/octograph/mapping"
+	"github.com/curated/octograph/parser"
 	"github.com/golang/glog"
 	"github.com/google/go-cmp/cmp"
 )
 
-const (
-	issueType = "issue"
-
-	reactionThumbsUp   = "THUMBS_UP"
-	reactionThumbsDown = "THUMBS_DOWN"
-	reactionLaugh      = "LAUGH"
-	reactionHooray     = "HOORAY"
-	reactionConfused   = "CONFUSED"
-	reactionHeart      = "HEART"
-
-	missingValue = "?"
-)
+const issueType = "issue"
 
 // IssueWorker struct
 type IssueWorker struct {
@@ -143,7 +133,7 @@ func (w *IssueWorker) reIndexNode(node gql.Issue) (bool, error) {
 
 	if err != nil {
 		if strings.Contains(err.Error(), indexer.ElasticErrorNotFound) {
-			return w.indexDoc(w.parseIssue(node))
+			return w.indexDoc(parser.ParseIssue(node))
 		}
 		glog.Errorf("Failed getting document: %v", err)
 		return false, err
@@ -157,7 +147,7 @@ func (w *IssueWorker) reIndexNode(node gql.Issue) (bool, error) {
 		return false, err
 	}
 
-	doc := w.parseIssue(node)
+	doc := parser.ParseIssue(node)
 	if !cmp.Equal(&current, doc) {
 		return w.indexDoc(doc)
 	}
@@ -189,71 +179,4 @@ func (w *IssueWorker) indexNextQuery() error {
 
 func (w *IssueWorker) wait() {
 	time.Sleep(time.Duration(w.Config.Issue.Interval) * time.Second)
-}
-
-func (w *IssueWorker) getReaction(key string, groups []gql.ReactionGroup) int {
-	for _, g := range groups {
-		if key == g.Content {
-			return g.Users.TotalCount
-		}
-	}
-	return 0
-}
-
-func (w *IssueWorker) getRepoOwnerLogin(repoURL string) string {
-	s := strings.Index(repoURL, "m/")
-	e := strings.LastIndex(repoURL, "/")
-	if s == -1 || e == -1 {
-		return missingValue
-	}
-	return repoURL[s+2 : e]
-}
-
-func (w *IssueWorker) getRepoName(repoURL string) string {
-	s := strings.LastIndex(repoURL, "/")
-	if s == -1 {
-		return missingValue
-	}
-	return repoURL[s+1:]
-}
-
-func (w *IssueWorker) getValue(s string) string {
-	if len(s) == 0 {
-		return missingValue
-	}
-	return s
-}
-
-func (w *IssueWorker) parseIssue(node gql.Issue) *mapping.Issue {
-	authorLogin := w.getValue(node.Author.Login)
-	repoOwnerLogin := w.getRepoOwnerLogin(node.Repository.URL)
-	repoName := w.getRepoName(node.Repository.URL)
-	repoLanguage := w.getValue(node.Repository.PrimaryLanguage.Name)
-
-	return &mapping.Issue{
-		ID:                    node.ID,
-		URL:                   node.URL,
-		Number:                node.Number,
-		Title:                 node.Title,
-		BodyText:              node.BodyText,
-		State:                 node.State,
-		ThumbsUp:              w.getReaction(reactionThumbsUp, node.ReactionGroups),
-		ThumbsDown:            w.getReaction(reactionThumbsDown, node.ReactionGroups),
-		Laugh:                 w.getReaction(reactionLaugh, node.ReactionGroups),
-		Hooray:                w.getReaction(reactionHooray, node.ReactionGroups),
-		Confused:              w.getReaction(reactionConfused, node.ReactionGroups),
-		Heart:                 w.getReaction(reactionHeart, node.ReactionGroups),
-		AuthorLogin:           authorLogin,
-		AuthorLoginSuggest:    authorLogin,
-		RepoOwnerLogin:        repoOwnerLogin,
-		RepoOwnerLoginSuggest: repoOwnerLogin,
-		RepoName:              repoName,
-		RepoNameSuggest:       repoName,
-		RepoLanguage:          repoLanguage,
-		RepoLanguageSuggest:   repoLanguage,
-		RepoForks:             node.Repository.Forks.TotalCount,
-		RepoStargazers:        node.Repository.Stargazers.TotalCount,
-		CreatedAt:             node.CreatedAt,
-		UpdatedAt:             node.UpdatedAt,
-	}
 }
