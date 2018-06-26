@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/curated/octograph/indexer"
 	"github.com/curated/octograph/mapping"
 	"github.com/golang/glog"
+	"github.com/google/go-cmp/cmp"
 )
 
 const (
@@ -22,7 +24,8 @@ const (
 	reactionConfused   = "CONFUSED"
 	reactionHeart      = "HEART"
 
-	missingValue = "?"
+	elasticErrorNotFound = "Error 404 (Not Found)"
+	missingValue         = "?"
 )
 
 // IssueWorker struct
@@ -71,7 +74,7 @@ func (w *IssueWorker) Index() error {
 		return err
 	}
 
-	return w.next()
+	return w.indexNextQuery()
 }
 
 // Delete index from Elastic cluster
@@ -85,7 +88,7 @@ func (w *IssueWorker) Delete() error {
 	return nil
 }
 
-func (w *IssueWorker) process(query string, endCursor *string, count int) error {
+func (w *IssueWorker) indexQuery(query string, endCursor *string, indexCount, parseCount int) error {
 	issues, err := w.Graph.FetchIssues(query, endCursor)
 
 	if err != nil {
@@ -98,40 +101,82 @@ func (w *IssueWorker) process(query string, endCursor *string, count int) error 
 			continue
 		}
 
-		doc := w.parseIssue(edge.Node)
-		err = w.Indexer.Index(
-			w.Config.Issue.Index,
-			issueType,
-			doc.ID,
-			doc,
-		)
+		indexed, err := w.reIndexNode(edge.Node)
 
 		if err != nil {
 			glog.Errorf("Failed indexing issue: %v", err)
 			return err
 		}
 
-		count++
+		parseCount++
+		if indexed {
+			indexCount++
+		}
 	}
 
 	if len(issues.Data.Search.PageInfo.EndCursor) > 0 {
-		return w.process(query, &issues.Data.Search.PageInfo.EndCursor, count)
+		return w.indexQuery(query, &issues.Data.Search.PageInfo.EndCursor, indexCount, parseCount)
 	}
 
-	glog.Errorf("Indexed %d/%d", count, issues.Data.Search.IssueCount)
+	glog.Infof("Indexed, parsed, fetched: %d, %d, %d", indexCount, parseCount, issues.Data.Search.IssueCount)
 
 	if w.Config.Issue.Interval >= 0 {
 		w.wait()
-		return w.next()
+		return w.indexNextQuery()
 	}
 
 	return nil
 }
 
-func (w *IssueWorker) next() error {
+func (w *IssueWorker) reIndexNode(node gql.Issue) (bool, error) {
+	b, err := w.Indexer.Get(
+		w.Config.Issue.Index,
+		issueType,
+		node.ID,
+	)
+
+	if err != nil {
+		if strings.Contains(err.Error(), elasticErrorNotFound) {
+			return w.indexDoc(w.parseIssue(node))
+		}
+		return false, err
+	}
+
+	var current mapping.Issue
+	err = json.Unmarshal(b, &current)
+
+	if err != nil {
+		glog.Errorf("Failed parsing document: %v", err)
+		return false, err
+	}
+
+	doc := w.parseIssue(node)
+	if !cmp.Equal(&current, doc) {
+		return w.indexDoc(doc)
+	}
+
+	return false, nil
+}
+
+func (w *IssueWorker) indexDoc(doc *mapping.Issue) (bool, error) {
+	err := w.Indexer.Index(
+		w.Config.Issue.Index,
+		issueType,
+		doc.ID,
+		doc,
+	)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (w *IssueWorker) indexNextQuery() error {
 	query := w.QueryRing.Next()
 	glog.Infof("Next query: %s", query)
-	return w.process(query, nil, 0)
+	return w.indexQuery(query, nil, 0, 0)
 }
 
 func (w *IssueWorker) wait() {
