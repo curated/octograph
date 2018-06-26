@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/curated/octograph/config"
 	"github.com/golang/glog"
@@ -119,7 +120,7 @@ func (i *Indexer) Get(index, typ, id string) ([]byte, error) {
 		Do(i.Context)
 
 	if err != nil {
-		if err.Error() == ElasticErrorNotFound {
+		if strings.Contains(err.Error(), ElasticErrorNotFound) {
 			return nil, err
 		}
 		glog.Errorf("Failed getting document: %v", err)
@@ -140,4 +141,16 @@ func (i *Indexer) GetMapping(filename string) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+// Flush indices
+func (i *Indexer) Flush(indices ...string) error {
+	_, err := i.Client.Flush(indices...).Do(i.Context)
+
+	if err != nil {
+		glog.Errorf("Failed flushing indices '%v': %v", indices, err)
+		return err
+	}
+
+	return nil
 }
