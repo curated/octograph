@@ -99,6 +99,18 @@ func TestIndex(t *testing.T) {
 	assert.Equal(t, int64(1), sr.TotalHits())
 }
 
+func TestGet(t *testing.T) {
+	err := idx.Index(c.Issue.Index, issueType, "id", "{\"foo\": \"bar\"}")
+	assert.Nil(t, err)
+
+	b, err := idx.Get(c.Issue.Index, issueType, "id")
+	var source map[string]interface{}
+	err = json.Unmarshal(b, &source)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "bar", source["foo"])
+}
+
 func TestGetMapping(t *testing.T) {
 	s, err := idx.GetMapping("issue.json")
 	assert.Nil(t, err)

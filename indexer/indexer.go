@@ -107,6 +107,22 @@ func (i *Indexer) Index(name, typ, id string, body interface{}) error {
 	return nil
 }
 
+// Get document source
+func (i *Indexer) Get(index, typ, id string) ([]byte, error) {
+	res, err := i.Client.Get().
+		Index(index).
+		Type(typ).
+		Id(id).
+		Do(i.Context)
+
+	if err != nil {
+		glog.Errorf("Failed getting document: %v", err)
+		return nil, err
+	}
+
+	return *res.Source, err
+}
+
 // GetMapping for index
 func (i *Indexer) GetMapping(filename string) (string, error) {
 	f := i.Config.GetPath(fmt.Sprintf("mapping/%s", filename))
