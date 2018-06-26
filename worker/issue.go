@@ -24,8 +24,7 @@ const (
 	reactionConfused   = "CONFUSED"
 	reactionHeart      = "HEART"
 
-	elasticErrorNotFound = "Error 404 (Not Found)"
-	missingValue         = "?"
+	missingValue = "?"
 )
 
 // IssueWorker struct
@@ -136,9 +135,10 @@ func (w *IssueWorker) reIndexNode(node gql.Issue) (bool, error) {
 	)
 
 	if err != nil {
-		if strings.Contains(err.Error(), elasticErrorNotFound) {
+		if strings.Contains(err.Error(), indexer.ElasticErrorNotFound) {
 			return w.indexDoc(w.parseIssue(node))
 		}
+		glog.Errorf("Failed getting document: %v", err)
 		return false, err
 	}
 
@@ -167,6 +167,7 @@ func (w *IssueWorker) indexDoc(doc *mapping.Issue) (bool, error) {
 	)
 
 	if err != nil {
+		glog.Errorf("Failed indexing document: %v", err)
 		return false, err
 	}
 

@@ -11,6 +11,9 @@ import (
 )
 
 const (
+	// ElasticErrorNotFound from get query
+	ElasticErrorNotFound = "Error 404 (Not Found)"
+
 	elasticScheme   = "https"
 	elasticSniffing = false
 )
@@ -116,6 +119,9 @@ func (i *Indexer) Get(index, typ, id string) ([]byte, error) {
 		Do(i.Context)
 
 	if err != nil {
+		if err.Error() == ElasticErrorNotFound {
+			return nil, err
+		}
 		glog.Errorf("Failed getting document: %v", err)
 		return nil, err
 	}
