@@ -120,6 +120,13 @@ func (w *IssueWorker) indexQuery(query string, endCursor *string, indexCount, pa
 	glog.Infof("Indexed, parsed, fetched: %d, %d, %d", indexCount, parseCount, issues.Data.Search.IssueCount)
 
 	if w.Config.Issue.Interval >= 0 {
+		err := w.Indexer.Flush(w.Config.Issue.Index)
+
+		if err != nil {
+			glog.Errorf("Failed flushing issue index: %v", err)
+			return err
+		}
+
 		w.wait()
 		return w.indexNextQuery()
 	}
