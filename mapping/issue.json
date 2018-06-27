@@ -41,7 +41,8 @@
           "type": "text"
         },
         "bodyText": {
-          "type": "text"
+          "type": "text",
+          "index": false
         },
         "state": {
           "type": "keyword"
