@@ -7,7 +7,7 @@
         "autocomplete_filter": {
           "type": "ngram",
           "min_gram": 1,
-          "max_gram": 25,
+          "max_gram": 100,
           "token_chars": ["letter", "digit"]
         }
       },
@@ -28,14 +28,9 @@
   "mappings": {
     "issue": {
       "properties": {
-        "id": {
-          "type": "keyword"
-        },
-        "url": {
-          "type": "text"
-        },
         "number": {
-          "type": "integer"
+          "type": "integer",
+          "index": false
         },
         "title": {
           "type": "text"
@@ -66,33 +61,21 @@
           "type": "integer"
         },
         "authorLogin": {
-          "type": "keyword"
-        },
-        "authorLoginSuggest": {
           "type": "completion",
           "analyzer": "autocomplete_analyzer",
           "search_analyzer": "autocomplete_search_analyzer"
         },
         "repoOwnerLogin": {
-          "type": "keyword"
-        },
-        "repoOwnerLoginSuggest": {
           "type": "completion",
           "analyzer": "autocomplete_analyzer",
           "search_analyzer": "autocomplete_search_analyzer"
         },
         "repoName": {
-          "type": "keyword"
-        },
-        "repoNameSuggest": {
           "type": "completion",
           "analyzer": "autocomplete_analyzer",
           "search_analyzer": "autocomplete_search_analyzer"
         },
         "repoLanguage": {
-          "type": "keyword"
-        },
-        "repoLanguageSuggest": {
           "type": "completion",
           "analyzer": "autocomplete_analyzer",
           "search_analyzer": "autocomplete_search_analyzer"

@@ -22,36 +22,25 @@ const (
 
 // ParseIssue from GraphQL node into Elastic document
 func ParseIssue(node gql.Issue) *mapping.Issue {
-	authorLogin := getValue(node.Author.Login)
-	repoOwnerLogin := getRepoOwnerLogin(node.Repository.URL)
-	repoName := getRepoName(node.Repository.URL)
-	repoLanguage := getValue(node.Repository.PrimaryLanguage.Name)
-
 	return &mapping.Issue{
-		ID:                    node.ID,
-		URL:                   node.URL,
-		Number:                node.Number,
-		Title:                 node.Title,
-		BodyText:              node.BodyText,
-		State:                 node.State,
-		ThumbsUp:              getReaction(reactionThumbsUp, node.ReactionGroups),
-		ThumbsDown:            getReaction(reactionThumbsDown, node.ReactionGroups),
-		Laugh:                 getReaction(reactionLaugh, node.ReactionGroups),
-		Hooray:                getReaction(reactionHooray, node.ReactionGroups),
-		Confused:              getReaction(reactionConfused, node.ReactionGroups),
-		Heart:                 getReaction(reactionHeart, node.ReactionGroups),
-		AuthorLogin:           authorLogin,
-		AuthorLoginSuggest:    authorLogin,
-		RepoOwnerLogin:        repoOwnerLogin,
-		RepoOwnerLoginSuggest: repoOwnerLogin,
-		RepoName:              repoName,
-		RepoNameSuggest:       repoName,
-		RepoLanguage:          repoLanguage,
-		RepoLanguageSuggest:   repoLanguage,
-		RepoForks:             node.Repository.Forks.TotalCount,
-		RepoStargazers:        node.Repository.Stargazers.TotalCount,
-		CreatedAt:             node.CreatedAt,
-		UpdatedAt:             node.UpdatedAt,
+		Number:         node.Number,
+		Title:          node.Title,
+		BodyText:       node.BodyText,
+		State:          node.State,
+		ThumbsUp:       getReaction(reactionThumbsUp, node.ReactionGroups),
+		ThumbsDown:     getReaction(reactionThumbsDown, node.ReactionGroups),
+		Laugh:          getReaction(reactionLaugh, node.ReactionGroups),
+		Hooray:         getReaction(reactionHooray, node.ReactionGroups),
+		Confused:       getReaction(reactionConfused, node.ReactionGroups),
+		Heart:          getReaction(reactionHeart, node.ReactionGroups),
+		AuthorLogin:    getValue(node.Author.Login),
+		RepoOwnerLogin: getRepoOwnerLogin(node.Repository.URL),
+		RepoName:       getRepoName(node.Repository.URL),
+		RepoLanguage:   getValue(node.Repository.PrimaryLanguage.Name),
+		RepoForks:      node.Repository.Forks.TotalCount,
+		RepoStargazers: node.Repository.Stargazers.TotalCount,
+		CreatedAt:      node.CreatedAt,
+		UpdatedAt:      node.UpdatedAt,
 	}
 }
 

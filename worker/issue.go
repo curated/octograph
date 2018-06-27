@@ -133,7 +133,7 @@ func (w *IssueWorker) reIndexNode(node gql.Issue) (bool, error) {
 
 	if err != nil {
 		if strings.Contains(err.Error(), indexer.ElasticErrorNotFound) {
-			return w.indexDoc(parser.ParseIssue(node))
+			return w.indexDoc(node.ID, parser.ParseIssue(node))
 		}
 		glog.Errorf("Failed getting document: %v", err)
 		return false, err
@@ -149,17 +149,17 @@ func (w *IssueWorker) reIndexNode(node gql.Issue) (bool, error) {
 
 	doc := parser.ParseIssue(node)
 	if !cmp.Equal(&current, doc) {
-		return w.indexDoc(doc)
+		return w.indexDoc(node.ID, doc)
 	}
 
 	return false, nil
 }
 
-func (w *IssueWorker) indexDoc(doc *mapping.Issue) (bool, error) {
+func (w *IssueWorker) indexDoc(id string, doc *mapping.Issue) (bool, error) {
 	err := w.Indexer.Index(
 		w.Config.Issue.Index,
 		issueType,
-		doc.ID,
+		id,
 		doc,
 	)
 
