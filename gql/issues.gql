@@ -20,10 +20,9 @@ fragment pageInfo on PageInfo {
 
 fragment issue on Issue {
   id
-  url
   number
   title
-  bodyText
+  body
   state
   createdAt
   updatedAt

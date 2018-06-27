@@ -24,10 +24,9 @@ type Issues struct {
 // Issue node structure from GraphQL
 type Issue struct {
 	ID        string
-	URL       string
 	Number    int
 	Title     string
-	BodyText  string
+	Body      string
 	State     string
 	CreatedAt time.Time
 	UpdatedAt time.Time

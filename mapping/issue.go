@@ -8,7 +8,7 @@ import (
 type Issue struct {
 	Number         int       `json:"number"`
 	Title          string    `json:"title"`
-	BodyText       string    `json:"bodyText"`
+	Body           string    `json:"body"`
 	State          string    `json:"state"`
 	ThumbsUp       int       `json:"thumbsUp"`
 	ThumbsDown     int       `json:"thumbsDown"`

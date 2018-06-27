@@ -25,7 +25,7 @@ func ParseIssue(node gql.Issue) *mapping.Issue {
 	return &mapping.Issue{
 		Number:         node.Number,
 		Title:          node.Title,
-		BodyText:       node.BodyText,
+		Body:           node.Body,
 		State:          node.State,
 		ThumbsUp:       getReaction(reactionThumbsUp, node.ReactionGroups),
 		ThumbsDown:     getReaction(reactionThumbsDown, node.ReactionGroups),
