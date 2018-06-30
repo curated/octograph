@@ -1,29 +1,7 @@
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 1,
-    "analysis": {
-      "filter": {
-        "autocomplete_filter": {
-          "type": "ngram",
-          "min_gram": 1,
-          "max_gram": 100,
-          "token_chars": ["letter", "digit"]
-        }
-      },
-      "analyzer": {
-        "autocomplete_analyzer": {
-          "type": "custom",
-          "tokenizer": "keyword",
-          "filter": ["lowercase", "autocomplete_filter"]
-        },
-        "autocomplete_search_analyzer": {
-          "type": "custom",
-          "tokenizer": "keyword",
-          "filter": ["lowercase"]
-        }
-      }
-    }
+    "number_of_replicas": 1
   },
   "mappings": {
     "issue": {
@@ -33,7 +11,8 @@
           "index": false
         },
         "title": {
-          "type": "text"
+          "type": "text",
+          "analyzer": "pattern"
         },
         "body": {
           "type": "text",
@@ -61,24 +40,16 @@
           "type": "integer"
         },
         "authorLogin": {
-          "type": "completion",
-          "analyzer": "autocomplete_analyzer",
-          "search_analyzer": "autocomplete_search_analyzer"
+          "type": "keyword"
         },
         "repoOwnerLogin": {
-          "type": "completion",
-          "analyzer": "autocomplete_analyzer",
-          "search_analyzer": "autocomplete_search_analyzer"
+          "type": "keyword"
         },
         "repoName": {
-          "type": "completion",
-          "analyzer": "autocomplete_analyzer",
-          "search_analyzer": "autocomplete_search_analyzer"
+          "type": "keyword"
         },
         "repoLanguage": {
-          "type": "completion",
-          "analyzer": "autocomplete_analyzer",
-          "search_analyzer": "autocomplete_search_analyzer"
+          "type": "keyword"
         },
         "repoForks": {
           "type": "integer"
