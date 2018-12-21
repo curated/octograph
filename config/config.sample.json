@@ -9,8 +9,12 @@
     "Token": ""
   },
   "Issue": {
-    "Interval": 60,
-    "QueryRing": ["reactions:>=100"],
+    "Interval": 300,
+    "QueryRing": [
+      "reactions:>=25 created:>={date}",
+      "reactions:>=25 updated:>={date}",
+      "reactions:>={reactions}"
+    ],
     "Index": "issue"
   }
 }
