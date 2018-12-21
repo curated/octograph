@@ -38,11 +38,11 @@ func NewIssueWorker(c *config.Config) *IssueWorker {
 // RecurseIndex with error intervals
 func (w *IssueWorker) RecurseIndex() error {
 	err := w.Index()
+	w.wait()
 
 	if err != nil {
 		glog.Info("Rolling back query ring")
 		w.QueryRing.Rollback()
-		w.wait()
 	}
 
 	return w.RecurseIndex()
